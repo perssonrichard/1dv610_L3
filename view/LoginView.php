@@ -61,19 +61,14 @@ class LoginView
 		}
 	}
 
-	public function getLoginUser(): \model\User
+	public function getUserCredentials(): \model\UserCredentials
 	{
-		$user = new \model\User($_POST[Config::$loginName], $_POST[Config::$loginPassword]);
-
-		// If keep logged in is checked
-		$user->setKeepLoggedIn(isset($_POST[Config::$loginKeep]));
-
-		return $user;
+		return new \model\UserCredentials($_POST[Config::$loginName], $_POST[Config::$loginPassword], isset($_POST[Config::$loginKeep]));
 	}
 
-	public function getCookieUser(): \model\User
+	public function getCookieUser(): \model\UserCredentials
 	{
-		return new \model\User($_COOKIE[Config::$loginCookieName], $_COOKIE[Config::$loginCookiePassword]);
+		return new \model\UserCredentials($_COOKIE[Config::$loginCookieName], $_COOKIE[Config::$loginCookiePassword], true);
 	}
 
 	public function hasCookieUser(): bool
@@ -125,26 +120,14 @@ class LoginView
 
 	public function setCookies(\model\User $user): void
 	{
-		$hashedPassword = password_hash($user->getPassword(), PASSWORD_BCRYPT);
-
 		// 86400 * 30 = 24 hours
 		setcookie(Config::$loginCookieName, $user->getUsername(), time() + (86400 * 30));
-		setcookie(Config::$loginCookiePassword, $hashedPassword, time() + (86400 * 30));
+		setcookie(Config::$loginCookiePassword, $user->getCookiePassword(), time() + (86400 * 30));
 	}
 
 	public function deleteCookies(): void
 	{
 		setcookie(Config::$loginCookieName, "", time() - 3600);
 		setcookie(Config::$loginCookiePassword, "", time() - 3600);
-	}
-
-	public function validateCookies(\model\User $user): bool
-	{
-		// TODO: VALIDATE HERE OR IN CONTROLLER?
-		if ($_COOKIE[Config::$loginCookiePassword] == $_SESSION['oldCookiePassword']) {
-			return true;
-		} else {
-			return false;
-		}
 	}
 }

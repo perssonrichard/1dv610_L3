@@ -17,35 +17,32 @@ class UserDB
         }
     }
 
-    public function addUser(User $user): void
+    public function addUser(RegisterInput $registerInput): void
     {
-        $username = $user->getUsername();
-        $password = $user->getPassword();
+        $username = $registerInput->getUsername();
+        $password = $registerInput->getPassword();
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-        $sqlSearchString = "INSERT INTO users (user_username, user_pwd) VALUES ('$username', '$passwordHash');";
+        $sqlSearchString = "INSERT INTO users (user_username, user_pwd, user_pwdCookie) VALUES ('$username', '$passwordHash', '$passwordHash');";
+        
         mysqli_query($this->databaseConnection, $sqlSearchString);
     }
 
-    private function getUser(User $user): User
+    public function getUser(UserCredentials $userCredentials): User
     {
-        $username = $user->getUsername();
+        $username = $userCredentials->getUsername();
 
         $sqlSearchString = "SELECT * FROM users WHERE BINARY user_username='$username';";
         $result = mysqli_query($this->databaseConnection, $sqlSearchString);
 
         $userArr = mysqli_fetch_assoc($result);
 
-        $user = new User($userArr['user_username'], $userArr['user_pwd']);
-
-        return $user;
+        return new User($userArr['user_username'], $userArr['user_pwd'], $userArr['user_pwdCookie']);
     }
 
-    public function hasUser(User $user): bool
+    public function hasUser(string $username): bool
     {
-        $username = $user->getUsername();
-
         $sqlSearchString = "SELECT * FROM users WHERE BINARY user_username='$username';";
 
         $result = mysqli_query($this->databaseConnection, $sqlSearchString);
@@ -59,10 +56,39 @@ class UserDB
         }
     }
 
-    public function verifyPassword(User $user): bool
+    public function verifyPassword(UserCredentials $userCredentials): bool
     {
-        $databaseUser = $this->getUser($user);
+        $databaseUser = $this->getUser($userCredentials);
 
-        return password_verify($user->getPassword(), $databaseUser->getPassword());
+        return password_verify($userCredentials->getPassword(), $databaseUser->getPassword());
+    }
+
+    public function validateCookies(\model\UserCredentials $userCredentials): bool
+    {
+        if (!$this->hasUser($userCredentials->getUsername())) {
+            return false;
+        }
+
+        $databaseUser = $this->getUser($userCredentials);
+
+        if ($databaseUser->getCookiePassword() == $userCredentials->getPassword()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function rehashCookiePassword(UserCredentials $userCredentials): void
+    {
+        $dbUser = $this->getUser($userCredentials);
+
+        $username = $dbUser->getUsername();
+        $password = $dbUser->getCookiePassword();
+
+        $rehash = password_hash($password, PASSWORD_BCRYPT);
+
+        $sqlUpdateString = "UPDATE users SET user_pwdCookie='$rehash' WHERE user_username='$username';";
+
+        mysqli_query($this->databaseConnection, $sqlUpdateString);
     }
 }

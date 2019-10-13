@@ -59,26 +59,27 @@ class MessageController
         }
     }
 
-    public function setUnsuccessfulLoginMsg(\model\User $user): void
+    public function setUnsuccessfulLoginMsg(\model\UserCredentials $userCredentials): void
     {
         $msg = "";
 
-        if (empty($user->getUsername())) {
+        if (empty($userCredentials->getUsername())) {
             $msg .= "Username is missing";
-        } else if (empty($user->getPassword())) {
+        } else if (empty($userCredentials->getPassword())) {
             $msg .= "Password is missing";
         } else {
             $msg .= "Wrong name or password";
         }
 
         $this->message->setMessage($msg);
+        $this->message->setFormUsername($userCredentials->getUsername());
     }
 
-    public function setUnsuccessfulRegisterMsg(\model\User $user): void
+    public function setUnsuccessfulRegisterMsg(\model\RegisterInput $registerInput): void
     {
-        $username = $user->getUsername();
-        $password = $user->getPassword();
-        $repeatPassword = $user->getRepeatPassword();
+        $username = $registerInput->getUsername();
+        $password = $registerInput->getPassword();
+        $repeatPassword = $registerInput->getRepeatPassword();
 
         $msg = "";
 
@@ -91,7 +92,7 @@ class MessageController
         if (empty($password) || strlen($password) < 6) {
             $msg .= "Password has too few characters, at least 6 characters.<br>";
         }
-        if ($this->userDB->hasUser($user)) {
+        if ($this->userDB->hasUser($username)) {
             $msg .= "User exists, pick another username.<br>";
         }
         if ($password != $repeatPassword) {
@@ -99,5 +100,6 @@ class MessageController
         }
 
         $this->message->setMessage($msg);
+        $this->message->setFormUsername(strip_tags($registerInput->getUsername()));
     }
 }

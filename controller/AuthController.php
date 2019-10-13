@@ -25,6 +25,9 @@ class AuthController
 
         if ($_SESSION['loggedin']) {
             $this->handleIsLoggedIn();
+            // If no session but valid cookies
+        } else if ($_SESSION['loggedin'] == false && $this->loginView->hasCookieUser()) {
+            $this->handleCookieUser();
         } else {
             $this->handleIsNotLoggedIn();
         }
@@ -32,12 +35,18 @@ class AuthController
 
     private function handleIsLoggedIn(): void
     {
-        if ($this->loginView->hasCookieUser()) {
-            $this->handleCookieUser();
-        }
-
         if ($this->loginView->userWantsToLogOut()) {
             $this->doLogout();
+        }
+
+        if ($this->loginView->hasCookieUser()) {
+            $userCredentials = $this->loginView->getCookieUser();
+
+            $this->userDB->rehashCookiePassword($userCredentials);
+
+            $updatedUser = $this->userDB->getUser($userCredentials);
+
+            $this->loginView->setCookies($updatedUser);
         }
 
         $this->messageController->setLoggedInMsg();
@@ -47,21 +56,24 @@ class AuthController
     {
         $user = $this->loginView->getCookieUser();
 
-        $this->loginView->setCookies($user);
-
-        if ($this->loginView->validateCookies()) {
+        if ($this->userDB->validateCookies($user)) {
             $_SESSION['loggedinWithCookie'] = true;
+            $_SESSION['loggedin'] = true;
+
+            $this->messageController->setLoggedInMsg();
         } else {
             $_SESSION['manipulatedCookie'] = true;
+
+            $this->messageController->setNotLoggedInMsg();
         }
     }
 
     private function handleIsNotLoggedIn(): void
     {
         if ($this->loginView->userWantsToLogIn()) {
-            $this->doLoginAttempt($this->loginView->getLoginUser());
+            $this->doLoginAttempt($this->loginView->getUserCredentials());
         } else if ($this->registerView->userWantsToRegister()) {
-            $this->doRegisterAttempt($this->registerView->getRegisterUser());
+            $this->doRegisterAttempt($this->registerView->getRegisterInput());
         }
 
         $this->messageController->setNotLoggedInMsg();
@@ -69,6 +81,10 @@ class AuthController
 
     private function validateSession(): void
     {
+        if (isset($_SESSION["loggedin"]) == false) {
+            $_SESSION["loggedin"] = false;
+        }
+
         if (isset($_SESSION['sessionValidationString'])) {
             $sessionValidationString = $_SERVER['REMOTE_ADDR'] . $_SERVER['HTTP_USER_AGENT'];
         }
@@ -82,28 +98,32 @@ class AuthController
         }
     }
 
-    public function doLoginAttempt(\model\User $user): void
+    public function doLoginAttempt(\model\UserCredentials $userCredentials): void
     {
-        if ($this->loginInputIsCorrect($user)) {
-            $this->successfulLogin($user);
+        if ($this->loginInputIsCorrect($userCredentials)) {
+            $this->successfulLogin($userCredentials);
         } else {
-            $this->messageController->setUnsuccessfulLoginMsg($user);
+            $this->messageController->setUnsuccessfulLoginMsg($userCredentials);
         }
     }
 
-    private function loginInputIsCorrect(\model\User $user): bool
+    private function loginInputIsCorrect(\model\UserCredentials $userCredentials): bool
     {
-        if (empty($user->getUsername()) || empty($user->getPassword()) || $this->userDB->verifyPassword($user) == false) {
+        if (empty($userCredentials->getUsername()) || empty($userCredentials->getPassword()) || $this->userDB->hasUser($userCredentials->getUsername()) == false) {
             return false;
-        } else {
+        } else if ($this->userDB->verifyPassword($userCredentials)) {
             return true;
+        } else {
+            return false;
         }
     }
 
-    private function successfulLogin(\model\User $user): void
+    private function successfulLogin(\model\UserCredentials $userCredentials): void
     {
         // If keep me logged in is checked
-        if ($user->getKeepLoggedIn()) {
+        if ($userCredentials->getKeepLoggedIn()) {
+            $user = $this->userDB->getUser($userCredentials);
+
             $this->loginView->setCookies($user);
 
             $_SESSION['showWelcomeKeep'] = true;
@@ -119,20 +139,20 @@ class AuthController
         exit();
     }
 
-    public function doRegisterAttempt(\model\User $user): void
+    public function doRegisterAttempt(\model\RegisterInput $registerInput): void
     {
-        if ($this->registrationInputIsCorrect($user)) {
-            $this->successfulRegistration($user);
+        if ($this->registrationInputIsCorrect($registerInput)) {
+            $this->successfulRegistration($registerInput);
         } else {
-            $this->messageController->setUnsuccessfulRegisterMsg($user);
+            $this->messageController->setUnsuccessfulRegisterMsg($registerInput);
         }
     }
 
-    private function registrationInputIsCorrect($user): bool
+    private function registrationInputIsCorrect(\model\RegisterInput $registerInput): bool
     {
-        $username = $user->getUsername();
-        $password = $user->getPassword();
-        $repeatPassword = $user->getRepeatPassword();
+        $username = $registerInput->getUsername();
+        $password = $registerInput->getPassword();
+        $repeatPassword = $registerInput->getRepeatPassword();
 
         if (
             empty($username) ||
@@ -140,7 +160,7 @@ class AuthController
             strlen($username) < 3 ||
             strlen($password) < 6 ||
             $username != strip_tags($username) ||
-            $this->userDB->hasUser($user) ||
+            $this->userDB->hasUser($username) ||
             $password != $repeatPassword
         ) {
             return false;
@@ -149,12 +169,12 @@ class AuthController
         }
     }
 
-    private function successfulRegistration(\model\User $user): void
+    private function successfulRegistration(\model\RegisterInput $registerInput): void
     {
-        $this->userDB->addUser($user);
+        $this->userDB->addUser($registerInput);
 
         $_SESSION['registeredNewUser'] = true;
-        $_SESSION['registeredNewUserName'] = $user->getUsername();
+        $_SESSION['registeredNewUserName'] = $registerInput->getUsername();
 
         header(Config::$redirectUrl);
         exit();

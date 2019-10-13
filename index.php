@@ -12,6 +12,8 @@ require_once('view/LayoutView.php');
 require_once('model/UserDB.php');
 require_once('model/User.php');
 require_once('model/Message.php');
+require_once('model/RegisterInput.php');
+require_once('model/UserCredentials.php');
 
 require_once('controller/AuthController.php');
 require_once('controller/MessageController.php');
@@ -32,10 +34,6 @@ $authController = new \controller\AuthController($userDB, $loginView, $registerV
 
 
 session_start();
-
-if (isset($_SESSION["loggedin"]) == false) {
-    $_SESSION["loggedin"] = false;
-}
 
 $authController->run();
 

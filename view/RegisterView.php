@@ -41,13 +41,9 @@ class RegisterView
         }
     }
 
-    public function getRegisterUser(): \model\User
+    public function getRegisterInput(): \model\RegisterInput
     {
-        $user = new \model\User($_POST[Config::$registerName], $_POST[Config::$registerPassword]);
-
-        $user->setRepeatPassword($_POST[Config::$registerRepeatPassword]);
-
-        return $user;
+        return new \model\RegisterInput($_POST[Config::$registerName], $_POST[Config::$registerPassword], $_POST[Config::$registerRepeatPassword]);
     }
 
     public function generateBackToLoginHTML()

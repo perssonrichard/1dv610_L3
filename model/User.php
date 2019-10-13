@@ -6,53 +6,27 @@ class User
 {
     private $username;
     private $password;
-    private $repeatPassword = "";
-    private $keepLoggedIn = false;
-    private $loggedInWithCookie = false;
+    private $cookiePassword;
 
-    public function __construct($username, $password)
+    public function __construct($username, $password, $cookiePassword)
     {
         $this->username = $username;
         $this->password = $password;
+        $this->cookiePassword = $cookiePassword;
     }
 
-    public function getUsername() : string
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getPassword() : string
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function getRepeatPassword() : string
+    public function getCookiePassword(): string
     {
-        return $this->repeatPassword;
-    }
-
-    public function setRepeatPassword($value) : void
-    {
-        $this->repeatPassword = $value;
-    }
-
-    public function getKeepLoggedIn() : bool
-    {
-        return $this->keepLoggedIn;
-    }
-
-    public function setKeepLoggedIn($value) : void
-    {
-        $this->keepLoggedIn = $value;
-    }
-
-    public function getLoggedInWithCookie() : bool
-    {
-        return $this->loggedInWithCookie;
-    }
-
-    public function setLoggedInWithCookie($value) : void
-    {
-        $this->loggedInWithCookie = $value;
+        return $this->cookiePassword;
     }
 }
