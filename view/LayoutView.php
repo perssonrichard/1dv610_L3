@@ -1,16 +1,10 @@
 <?php
 
+namespace view;
+
 class LayoutView
 {
-  private $model;
-  private $controller;
   private $registerQueryString = 'register';
-
-  public function __construct(Model $model, Controller $controller)
-  {
-    $this->model = $model;
-    $this->controller = $controller;
-  }
 
   public function render($isLoggedIn, LoginView $loginView, RegisterView $registerView, DateTimeView $dtv)
   {

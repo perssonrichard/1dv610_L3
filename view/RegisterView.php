@@ -1,22 +1,53 @@
 <?php
 
+namespace view;
+
+use Config;
+
 class RegisterView
 {
-    private $model;
+    private $message;
 
-    public function __construct(Model $model)
+    public function __construct(\model\Message $m)
     {
-        $this->model = $model;
+        $this->message = $m;
     }
 
     /**
      * The response on what to render
      */
-    public function response()
+    public function response(): string
     {
-        $response = $this->generateRegisterFormHTML($this->model->message);
+        $response = $this->generateRegisterFormHTML();
 
         return $response;
+    }
+
+    public function userWantsToRegister(): bool
+    {
+        if ($this->userClicksRegisterButton()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private function userClicksRegisterButton(): bool
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['RegisterView::Register'])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getRegisterUser(): \model\User
+    {
+        $user = new \model\User($_POST[Config::$registerName], $_POST[Config::$registerPassword]);
+
+        $user->setRepeatPassword($_POST[Config::$registerRepeatPassword]);
+
+        return $user;
     }
 
     public function generateBackToLoginHTML()
@@ -24,16 +55,16 @@ class RegisterView
         return '<a href="?">Back to login</a>';
     }
 
-    private function generateRegisterFormHTML($message)
+    private function generateRegisterFormHTML()
     {
         return '
         <h2>Register new user</h2>
         <form action="?register" method="post" enctype="multipart/form-data">
 				<fieldset>
 				<legend>Register a new user - Write username and password</legend>
-					<p id="' . Config::$registerMessage . '">' . $message . '</p>
+					<p id="' . Config::$registerMessage . '">' . $this->message->getMessage() . '</p>
 					<label for="' . Config::$registerName . '">Username :</label>
-					<input type="text" size="20" name="' . Config::$registerName . '" id="' . Config::$registerName . '" value="' . $this->model->usernameVariable . '">
+					<input type="text" size="20" name="' . Config::$registerName . '" id="' . Config::$registerName . '" value="' . $this->message->getFormUsername() . '">
 					<br>
 					<label for="' . Config::$registerPassword . '">Password  :</label>
 					<input type="password" size="20" name="' . Config::$registerPassword . '" id="' . Config::$registerPassword . '" value="">

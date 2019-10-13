@@ -19,5 +19,5 @@ class Config
     public static $registerMessage = 'RegisterView::Message';
     public static $registerRegistration = 'RegisterView::Register';
 
-    public static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/index.php';
+    public static $redirectUrl = 'Location: index.php';
 }
