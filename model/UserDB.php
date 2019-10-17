@@ -2,16 +2,31 @@
 
 namespace model;
 
-use ServerConfig;
-
 class UserDB
 {
+    /**
+     * REMOTE SERVER CONNECTION
+     */
+    private static $dbServerName = "localhost";
+    private static $dbUsername = "root";
+    private static $dbPassword = "";
+    private static $dbName = "loginsystem";
+
+    /**
+     * MYSQL TABLE INFORMATION
+     */
+    private static $sqlTableName = "users";
+    private static $sqlNameRow = "user_username";
+    private static $sqlPwdRow = "user_pwd";
+    private static $sqlPwdCookieRow = "user_pwdCookie";
+
+
     private $databaseConnection;
 
     public function __construct()
     {
         try {
-            $this->databaseConnection = mysqli_connect(ServerConfig::$dbServerName, ServerConfig::$dbUsername, ServerConfig::$dbPassword, ServerConfig::$dbName);
+            $this->databaseConnection = mysqli_connect(self::$dbServerName, self::$dbUsername, self::$dbPassword, self::$dbName);
         } catch (Exception $e) {
             exit('Database connection could not be established.');
         }
@@ -25,7 +40,7 @@ class UserDB
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
         $sqlSearchString = "INSERT INTO users (user_username, user_pwd, user_pwdCookie) VALUES ('$username', '$passwordHash', '$passwordHash');";
-        
+
         mysqli_query($this->databaseConnection, $sqlSearchString);
     }
 
@@ -63,7 +78,7 @@ class UserDB
         return password_verify($userCredentials->getPassword(), $databaseUser->getPassword());
     }
 
-    public function validateCookies(\model\UserCredentials $userCredentials): bool
+    public function validateCookies(UserCredentials $userCredentials): bool
     {
         if (!$this->hasUser($userCredentials->getUsername())) {
             return false;

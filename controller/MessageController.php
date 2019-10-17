@@ -15,25 +15,6 @@ class MessageController
         $this->userDB = $db;
     }
 
-    public function setLoggedInMsg(): void
-    {
-        if (isset($_SESSION['loggedinWithCookie']) && $_SESSION['loggedinWithCookie']) {
-            $this->message->setMessage("Welcome back with cookie");
-
-            $_SESSION['loggedinWithCookie'] = false;
-        }
-        if (isset($_SESSION['showWelcomeKeep']) && $_SESSION["showWelcomeKeep"]) {
-            $this->message->setMessage("Welcome and you will be remembered");
-
-            $_SESSION['showWelcomeKeep'] = false;
-        }
-        if (isset($_SESSION["showWelcome"]) && $_SESSION["showWelcome"]) {
-            $this->message->setMessage("Welcome");
-
-            $_SESSION['showWelcome'] = false;
-        }
-    }
-
     public function setNotLoggedInMsg(): void
     {
         // If recently registered

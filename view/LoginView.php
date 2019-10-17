@@ -2,15 +2,27 @@
 
 namespace view;
 
-use Config;
-
 class LoginView
 {
+	// Define HTML ID's
+	private static $_cookieName = 'LoginView::CookieName';
+	private static $_cookiePassword = 'LoginView::CookiePassword';
+	private static $_username = 'LoginView::UserName';
+	private static $_password = 'LoginView::Password';
+	private static $_keep = 'LoginView::KeepMeLoggedIn';
+	private static $_login = 'LoginView::Login';
+	private static $_logout = 'LoginView::Logout';
+	private static $_message = 'LoginView::Message';
+
+	private $modelMessage;
+	private $userDB;
+
 	private $message;
 
-	public function __construct(\model\Message $m)
+	public function __construct(\model\Message $m, \model\UserDB $db)
 	{
-		$this->message = $m;
+		$this->modelMessage = $m;
+		$this->userDB = $db;
 	}
 
 	/**
@@ -18,14 +30,42 @@ class LoginView
 	 */
 	public function response()
 	{
-		if ($_SESSION["loggedin"]) {
+		$this->setWelcomeMessage();
+
+		if ($_SESSION["loggedIn"]) {
 			return $this->generateLogoutButtonHTML();
 		} else {
 			return $this->generateLoginFormHTML();
 		}
 	}
 
-	public function userWantsToLogIn(): bool
+	private function setWelcomeMessage()
+	{
+		if (isset($_SESSION['showWelcome']) && $_SESSION['showWelcome']) {
+			$this->message = "Welcome";
+		} else if (isset($_SESSION['showWelcomeKeep']) && $_SESSION['showWelcomeKeep']) {
+			$this->message = "Welcome and you will be remembered";
+		} else if (isset($_SESSION['loggedInWithCookie']) && $_SESSION['loggedInWithCookie']) {
+			$this->message = "Welcome back with cookie";
+		}
+
+		// Prevent message from showing twice
+		$_SESSION['showWelcome'] = false;
+		$_SESSION['showWelcomeKeep'] = false;
+		$_SESSION['loggedInWithCookie'] = false;
+	}
+
+	public function setEmptyUsernameMessage(): void
+	{
+		$this->message = "Username is missing";
+	}
+
+	public function setEmptyPasswordMessage(): void
+	{
+		$this->message = "Password is missing";
+	}
+
+	public function userTriesToLogIn(): bool
 	{
 		if ($this->userClicksLoginButton()) {
 			return true;
@@ -36,11 +76,30 @@ class LoginView
 
 	private function userClicksLoginButton(): bool
 	{
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['LoginView::Login'])) {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_login])) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public function setWelcomeSession(\model\UserCredentials $userCredentials): void
+	{
+		// If keep me logged in is checked
+		if ($userCredentials->getKeepLoggedIn()) {
+			$user = $this->userDB->getUser($userCredentials);
+
+			$this->setCookies($user);
+
+			$_SESSION['showWelcomeKeep'] = true;
+		} else {
+			$_SESSION['showWelcome'] = true;
+		}
+	}
+
+	public function setLoggedInWithCookieSession(): void
+	{
+		$_SESSION['loggedInWithCookie'] = true;
 	}
 
 	public function userWantsToLogOut(): bool
@@ -54,7 +113,7 @@ class LoginView
 
 	private function userClicksLogoutButton(): bool
 	{
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['LoginView::Logout']) && $_SESSION["loggedin"] == true) {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['LoginView::Logout'])) {
 			return true;
 		} else {
 			return false;
@@ -63,21 +122,39 @@ class LoginView
 
 	public function getUserCredentials(): \model\UserCredentials
 	{
-		return new \model\UserCredentials($_POST[Config::$loginName], $_POST[Config::$loginPassword], isset($_POST[Config::$loginKeep]));
+		return new \model\UserCredentials($_POST[self::$_username], $_POST[self::$_password], isset($_POST[self::$_keep]));
 	}
 
 	public function getCookieUser(): \model\UserCredentials
 	{
-		return new \model\UserCredentials($_COOKIE[Config::$loginCookieName], $_COOKIE[Config::$loginCookiePassword], true);
+		return new \model\UserCredentials($_COOKIE[self::$_cookieName], $_COOKIE[self::$_cookiePassword], true);
+	}
+
+	public function getValidationString(): \model\ValidationString
+	{
+		return new \model\ValidationString($_SERVER['REMOTE_ADDR'], $_SERVER['HTTP_USER_AGENT']);
 	}
 
 	public function hasCookieUser(): bool
 	{
-		if (isset($_COOKIE[Config::$loginCookieName]) && isset($_COOKIE[Config::$loginCookiePassword])) {
+		if (isset($_COOKIE[self::$_cookieName]) && isset($_COOKIE[self::$_cookiePassword])) {
 			return true;
 		} else {
 			return false;
 		}
+	}
+
+	public function setCookies(\model\User $user): void
+	{
+		// 86400 * 30 = 24 hours
+		setcookie(self::$_cookieName, $user->getUsername(), time() + (86400 * 30));
+		setcookie(self::$_cookiePassword, $user->getCookiePassword(), time() + (86400 * 30));
+	}
+
+	public function deleteCookies(): void
+	{
+		setcookie(self::$_cookieName, "", time() - 3600);
+		setcookie(self::$_cookiePassword, "", time() - 3600);
 	}
 
 	public function generateRegisterUserHTML($queryString)
@@ -89,8 +166,8 @@ class LoginView
 	{
 		return '
 			<form  method="post" >
-				<p id="' . Config::$loginMessage . '">' . $this->message->getMessage() . '</p>
-				<input type="submit" name="' . Config::$loginLogout . '" value="logout"/>
+				<p id="' . self::$_message . '">' . $this->message . '</p>
+				<input type="submit" name="' . self::$_logout . '" value="logout"/>
 			</form>
 		';
 	}
@@ -101,33 +178,20 @@ class LoginView
 			<form method="post" > 
 				<fieldset>
 					<legend>Login - enter Username and password</legend>
-					<p id="' . Config::$loginMessage . '">' . $this->message->getMessage() . '</p>
+					<p id="' . self::$_message . '">' . $this->message . '</p>
 					
-					<label for="' . Config::$loginName . '">Username :</label>
-					<input type="text" id="' . Config::$loginName . '" name="' . Config::$loginName . '" value="' . $this->message->getFormUsername() . '" />
+					<label for="' . self::$_username . '">Username :</label>
+					<input type="text" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->modelMessage->getFormUsername() . '" />
 
-					<label for="' . Config::$loginPassword . '">Password :</label>
-					<input type="password" id="' . Config::$loginPassword . '" name="' . Config::$loginPassword . '" />
+					<label for="' . self::$_password . '">Password :</label>
+					<input type="password" id="' . self::$_password . '" name="' . self::$_password . '" />
 
-					<label for="' . Config::$loginKeep . '">Keep me logged in  :</label>
-					<input type="checkbox" id="' . Config::$loginKeep . '" name="' . Config::$loginKeep . '" />
+					<label for="' . self::$_keep . '">Keep me logged in  :</label>
+					<input type="checkbox" id="' . self::$_keep . '" name="' . self::$_keep . '" />
 					
-					<input type="submit" name="' . Config::$loginLogin . '" value="login" />
+					<input type="submit" name="' . self::$_login . '" value="login" />
 				</fieldset>
 			</form>
 		';
-	}
-
-	public function setCookies(\model\User $user): void
-	{
-		// 86400 * 30 = 24 hours
-		setcookie(Config::$loginCookieName, $user->getUsername(), time() + (86400 * 30));
-		setcookie(Config::$loginCookiePassword, $user->getCookiePassword(), time() + (86400 * 30));
-	}
-
-	public function deleteCookies(): void
-	{
-		setcookie(Config::$loginCookieName, "", time() - 3600);
-		setcookie(Config::$loginCookiePassword, "", time() - 3600);
 	}
 }

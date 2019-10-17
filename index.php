@@ -14,28 +14,40 @@ require_once('model/User.php');
 require_once('model/Message.php');
 require_once('model/RegisterInput.php');
 require_once('model/UserCredentials.php');
+require_once('model/HandleSession.php');
+require_once('model/ValidationString.php');
+require_once('model/Exceptions.php');
 
-require_once('controller/AuthController.php');
+require_once('controller/LoggedInController.php');
+require_once('controller/LoginController.php');
+require_once('controller/LogoutController.php');
+require_once('controller/MasterController.php');
+require_once('controller/RegisterController.php');
 require_once('controller/MessageController.php');
 
 require_once('config/config.php');
-require_once('config/serverConfig.php');
+
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 $userDB = new \model\UserDB();
 $message = new \model\Message();
 
-$loginView = new \view\LoginView($message);
+$loginView = new \view\LoginView($message, $userDB);
 $registerView = new \view\RegisterView($message);
-$dtv = new \view\DateTimeView();
-$view = new \view\LayoutView();
+$dateTimeView = new \view\DateTimeView();
+$layoutView = new \view\LayoutView();
 
-$messageController = new \controller\MessageController($message, $loginView, $userDB);
-$authController = new \controller\AuthController($userDB, $loginView, $registerView, $messageController);
+$masterController = new \controller\MasterController($userDB, $loginView, $registerView, $message);
+
+try {
+    $masterController->run();
+} catch (wrongUserCredentialsException $e) {
+    var_dump("Wrong input");
+}
 
 
-session_start();
+$layoutView->render($_SESSION['loggedIn'], $loginView, $registerView, $dateTimeView);
 
-$authController->run();
-
-// Render content
-$view->render($_SESSION['loggedin'], $loginView, $registerView, $dtv);
+var_dump($_SESSION);

@@ -2,15 +2,21 @@
 
 namespace view;
 
-use Config;
 
 class RegisterView
 {
-    private $message;
+    // Define HTML ID's
+    private static $repeat = 'RegisterView::PasswordRepeat';
+    private static $username = 'RegisterView::UserName';
+    private static $password = 'RegisterView::Password';
+    private static $message = 'RegisterView::Message';
+    private static $register = 'RegisterView::Register';
+
+    private $modelMessage;
 
     public function __construct(\model\Message $m)
     {
-        $this->message = $m;
+        $this->modelMessage = $m;
     }
 
     /**
@@ -23,7 +29,7 @@ class RegisterView
         return $response;
     }
 
-    public function userWantsToRegister(): bool
+    public function userTriesToRegister(): bool
     {
         if ($this->userClicksRegisterButton()) {
             return true;
@@ -43,7 +49,7 @@ class RegisterView
 
     public function getRegisterInput(): \model\RegisterInput
     {
-        return new \model\RegisterInput($_POST[Config::$registerName], $_POST[Config::$registerPassword], $_POST[Config::$registerRepeatPassword]);
+        return new \model\RegisterInput($_POST[self::$username], $_POST[self::$password], $_POST[self::$repeat]);
     }
 
     public function generateBackToLoginHTML()
@@ -58,17 +64,17 @@ class RegisterView
         <form action="?register" method="post" enctype="multipart/form-data">
 				<fieldset>
 				<legend>Register a new user - Write username and password</legend>
-					<p id="' . Config::$registerMessage . '">' . $this->message->getMessage() . '</p>
-					<label for="' . Config::$registerName . '">Username :</label>
-					<input type="text" size="20" name="' . Config::$registerName . '" id="' . Config::$registerName . '" value="' . $this->message->getFormUsername() . '">
+					<p id="' . self::$message . '">' . $this->modelMessage->getMessage() . '</p>
+					<label for="' . self::$username . '">Username :</label>
+					<input type="text" size="20" name="' . self::$username . '" id="' . self::$username . '" value="' . $this->modelMessage->getFormUsername() . '">
 					<br>
-					<label for="' . Config::$registerPassword . '">Password  :</label>
-					<input type="password" size="20" name="' . Config::$registerPassword . '" id="' . Config::$registerPassword . '" value="">
+					<label for="' . self::$password . '">Password  :</label>
+					<input type="password" size="20" name="' . self::$password . '" id="' . self::$password . '" value="">
 					<br>
-					<label for="' . Config::$registerPassword . 'Repeat">Repeat password  :</label>
-					<input type="password" size="20" name="' . Config::$registerPassword . 'Repeat" id="' . Config::$registerPassword . 'Repeat" value="">
+					<label for="' . self::$password . 'Repeat">Repeat password  :</label>
+					<input type="password" size="20" name="' . self::$password . 'Repeat" id="' . self::$password . 'Repeat" value="">
 					<br>
-					<input id="submit" type="submit" name="' . Config::$registerRegistration . '" value="Register">
+					<input id="submit" type="submit" name="' . self::$register . '" value="Register">
 					<br>
 				</fieldset>
             </form>
