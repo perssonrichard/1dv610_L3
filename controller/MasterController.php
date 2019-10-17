@@ -31,23 +31,25 @@ class MasterController
 
     public function run()
     {
-        try {
-            if ($this->loggedInState->getState()) {
-                $this->handleLoggedIn();
-            } else {
-                $this->handleNotLoggedIn();
-            }
-        } catch (EmptyUsernameException $e) {
-            $this->loginView->setEmptyUsernameMessage();
-        } catch (EmptyPasswordException $e) {
-            $this->loginView->setEmptyPasswordMessage();
+        $this->loggedInState->doValidateSession($this->loginView->getValidationString());
+
+        if ($this->loggedInState->getState()) {
+            $this->handleLoggedIn();
+        } else {
+            $this->handleNotLoggedIn();
         }
     }
 
     private function handleNotLoggedIn(): void
     {
         if ($this->loginView->userTriesToLogIn()) {
-            $this->loginController->doLogInAttempt();
+            try {
+                $this->loginController->doLogInAttempt();
+            } catch (EmptyUsernameException $e) {
+                $this->loginView->setEmptyUsernameMessage();
+            } catch (EmptyPasswordException $e) {
+                $this->loginView->setEmptyPasswordMessage();
+            }
         } else if ($this->loginView->hasCookieUser()) {
             $this->loginController->handleCookieUser();
         } else if ($this->registerView->userTriesToRegister()) {

@@ -63,7 +63,7 @@ class LoginView
 
 		// Prevent message from showing twice
 		$_SESSION[self::$showWelcome] = false;
-		$_SESSION[self::$showWelcome] = false;
+		$_SESSION[self::$showWelcomeKeep] = false;
 		$_SESSION[self::$loggedInWithCookie] = false;
 		$_SESSION[self::$showBye] = false;
 		$_SESSION[self::$newUser] = false;

@@ -2,10 +2,10 @@
 
 namespace controller;
 
-use Config;
-
 class LoginController
 {
+    private static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/L3/index.php';
+
     private $loginView;
     private $userDB;
     private $loggedInState;
@@ -32,7 +32,7 @@ class LoginController
             $this->loggedInState->setState(true);
             $this->loggedInState->setSessionValidation($this->loginView->getValidationString());
 
-            header(Config::$redirectUrl);
+            header(self::$redirectUrl);
             exit();
         } else {
             $this->loginView->setWrongUsernameOrPasswordMessage();

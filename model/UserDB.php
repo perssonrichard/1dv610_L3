@@ -2,15 +2,25 @@
 
 namespace model;
 
+use Exception;
+
 class UserDB
 {
+    /**
+     * LOCAL SERVER CONNECTION
+     */
+    // private static $dbServerName = "localhost";
+    // private static $dbUsername = "root";
+    // private static $dbPassword = "";
+    // private static $dbName = "loginsystem";
+
     /**
      * REMOTE SERVER CONNECTION
      */
     private static $dbServerName = "localhost";
-    private static $dbUsername = "root";
-    private static $dbPassword = "";
-    private static $dbName = "loginsystem";
+    private static $dbUsername = "persglgr_root";
+    private static $dbPassword = "pa)gYnW99x*j";
+    private static $dbName = "persglgr_loginsystem_L3";
 
     /**
      * MYSQL TABLE INFORMATION
@@ -39,26 +49,31 @@ class UserDB
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-        $sqlSearchString = "INSERT INTO users (user_username, user_pwd, user_pwdCookie) VALUES ('$username', '$passwordHash', '$passwordHash');";
+        $searchString =
+            "INSERT INTO " . self::$sqlTableName .
+            " ("
+            . self::$sqlNameRow . ", " . self::$sqlPwdRow . ", " . self::$sqlPwdCookieRow .
+            ") " .
+            "VALUES ('$username', '$passwordHash', '$passwordHash');";
 
-        mysqli_query($this->databaseConnection, $sqlSearchString);
+        mysqli_query($this->databaseConnection, $searchString);
     }
 
     public function getUser(UserCredentials $userCredentials): User
     {
         $username = $userCredentials->getUsername();
 
-        $sqlSearchString = "SELECT * FROM users WHERE BINARY user_username='$username';";
-        $result = mysqli_query($this->databaseConnection, $sqlSearchString);
+        $searchString = "SELECT * FROM " . self::$sqlTableName . " WHERE BINARY " . self::$sqlNameRow . "='$username';";
+        $result = mysqli_query($this->databaseConnection, $searchString);
 
         $userArr = mysqli_fetch_assoc($result);
 
-        return new User($userArr['user_username'], $userArr['user_pwd'], $userArr['user_pwdCookie']);
+        return new User($userArr[self::$sqlNameRow], $userArr[self::$sqlPwdRow], $userArr[self::$sqlPwdCookieRow]);
     }
 
     public function hasUser(string $username): bool
     {
-        $sqlSearchString = "SELECT * FROM users WHERE BINARY user_username='$username';";
+        $sqlSearchString = "SELECT * FROM " . self::$sqlTableName . " WHERE BINARY " . self::$sqlNameRow . "='$username';";
 
         $result = mysqli_query($this->databaseConnection, $sqlSearchString);
 
@@ -102,7 +117,7 @@ class UserDB
 
         $rehash = password_hash($password, PASSWORD_BCRYPT);
 
-        $sqlUpdateString = "UPDATE users SET user_pwdCookie='$rehash' WHERE user_username='$username';";
+        $sqlUpdateString = "UPDATE " . self::$sqlTableName . " SET " . self::$sqlPwdCookieRow . "='$rehash' WHERE " . self::$sqlNameRow . "='$username';";
 
         mysqli_query($this->databaseConnection, $sqlUpdateString);
     }

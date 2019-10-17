@@ -29,7 +29,7 @@ class LayoutView
   }
 
   /**
-   * Decides what link to render
+   * Decide what link to render
    */
   private function linkToRender($isLoggedIn, LoginView $loginView, RegisterView $registerView)
   {
@@ -41,11 +41,11 @@ class LayoutView
   }
 
   /**
-   * Decides what view to render
+   * Decide what view to render
    */
   private function viewToRender(LoginView $loginView, RegisterView $registerView)
   {
-    if (isset($_GET[$this->registerQueryString])) {
+    if (isset($_GET[self::$registerQueryString])) {
       return $registerView->response();
     } else {
       return $loginView->response();

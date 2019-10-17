@@ -26,11 +26,17 @@ class LoggedInState
 
     public function setSessionValidation(\model\ValidationString $validationString): void
     {
-        $_SESSION[self::$_sessionValidation] = $validationString;
+        $_SESSION[self::$_sessionValidation] = $validationString->getValidation();
     }
 
-    public function getSessionValidation(): string
+    public function doValidateSession(\model\ValidationString $validationString): void
     {
-        return $_SESSION[self::$_sessionValidation];
+        if (isset($_SESSION[self::$_sessionValidation])) {
+            if ($_SESSION[self::$_sessionValidation] == $validationString->getValidation()) {
+                $this->setState(true);
+            } else {
+                $this->setState(false);
+            }
+        }
     }
 }

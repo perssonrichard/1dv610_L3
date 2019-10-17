@@ -23,15 +23,12 @@ require_once('controller/LogoutController.php');
 require_once('controller/MasterController.php');
 require_once('controller/RegisterController.php');
 
-require_once('config/config.php');
-
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
 $userDB = new \model\UserDB();
 $loggedInState = new \model\LoggedInState();
-
 
 $loginView = new \view\LoginView($loggedInState, $userDB);
 $registerView = new \view\RegisterView($userDB);
@@ -43,5 +40,3 @@ $masterController = new \controller\MasterController($loggedInState, $userDB, $l
 $masterController->run();
 
 $layoutView->render($loggedInState->getState(), $loginView, $registerView, $dateTimeView);
-
-var_dump($_SESSION);

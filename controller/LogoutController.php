@@ -2,10 +2,9 @@
 
 namespace controller;
 
-use Config;
-
 class LogoutController
 {
+    private static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/L3/index.php';
     private $loginView;
 
     public function __construct(\view\LoginView $lv)
@@ -23,7 +22,7 @@ class LogoutController
 
         $this->loginView->setLogoutSession();
 
-        header(Config::$redirectUrl);
+        header(self::$redirectUrl);
         exit();
     }
 }

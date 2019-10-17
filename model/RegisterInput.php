@@ -2,8 +2,6 @@
 
 namespace model;
 
-use WrongRegisterInputException;
-
 class RegisterInput
 {
     private $username;

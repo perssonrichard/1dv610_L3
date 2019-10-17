@@ -114,7 +114,7 @@ class RegisterView
     private function getFormUsernameInput(): string
 	{
 		if (isset($_POST[self::$_username])) {
-			return $_POST[self::$_username];
+			return strip_tags($_POST[self::$_username]);
 		} else {
 			return "";
 		}
