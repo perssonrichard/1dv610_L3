@@ -7,8 +7,8 @@ use Config;
 class RegisterController
 {
     private $registerView;
-    private $handleSession;
     private $userDB;
+    private $loginView;
 
     /**
      * @var \model\RegisterInput
@@ -16,10 +16,10 @@ class RegisterController
     private $registerInput;
 
 
-    public function __construct(\view\RegisterView $rv, \model\HandleSession $hs, \model\UserDB $db)
+    public function __construct(\view\RegisterView $rv, \view\LoginView $lv, \model\UserDB $db)
     {
         $this->registerView = $rv;
-        $this->handleSession = $hs;
+        $this->loginView = $lv;
         $this->userDB = $db;
     }
 
@@ -29,9 +29,15 @@ class RegisterController
 
         if ($this->registerInputIsCorrect()) {
             $this->successfulRegistration();
+        } else {
+            $this->registerView->setWrongInputMessage();
         }
     }
 
+    /**
+     * TODO: These rules should not be dependant on magic numbers and
+     * should exist in the model, possibly caught as an exception.
+     */
     private function registerInputIsCorrect(): bool
     {
         $username = $this->registerInput->getUsername();
@@ -57,8 +63,8 @@ class RegisterController
     {
         $this->userDB->addUser($this->registerInput);
 
-        $this->handleSession->setRegisteredNewUser(true);
-        $this->handleSession->setRegisteredNewUserName($this->registerInput->getUsername());
+        $this->loginView->setNewUserSession();
+        $this->loginView->setNewUsersNameSession($this->registerInput->getUsername());
 
         header(Config::$redirectUrl);
         exit();

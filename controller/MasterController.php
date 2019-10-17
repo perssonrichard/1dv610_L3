@@ -15,35 +15,31 @@ class MasterController
     private $logoutController;
     private $registerController;
 
-    private $handleSession;
+    private $loggedInState;
 
-    public function __construct(\model\UserDB $db, \view\LoginView $lv, \view\RegisterView $rv, \model\Message $m)
+    public function __construct(\model\LoggedInState $lis, \model\UserDB $db, \view\LoginView $lv, \view\RegisterView $rv)
     {
         $this->loginView = $lv;
         $this->registerView = $rv;
+        $this->loggedInState = $lis;
 
-        $this->handleSession = new \model\HandleSession();
-
-        $this->loginController = new LoginController($lv, $db, $this->handleSession);
+        $this->loginController = new LoginController($lv, $db, $lis);
         $this->loggedInController = new LoggedInController($lv, $db);
-        $this->logoutController = new LogoutController($lv, $this->handleSession);
-        $this->registerController = new RegisterController($rv, $this->handleSession, $db);
+        $this->logoutController = new LogoutController($lv);
+        $this->registerController = new RegisterController($rv, $lv, $db);
     }
 
     public function run()
     {
         try {
-            $this->handleSession->doSetInitialLoggedIn();
-            $this->handleSession->doValidateSession($this->loginView->getValidationString());
-
-            if ($this->handleSession->isLoggedIn()) {
+            if ($this->loggedInState->getState()) {
                 $this->handleLoggedIn();
             } else {
                 $this->handleNotLoggedIn();
             }
-        } catch (emptyUsernameException $e) {
+        } catch (EmptyUsernameException $e) {
             $this->loginView->setEmptyUsernameMessage();
-        } catch (emptyPasswordException $e) {
+        } catch (EmptyPasswordException $e) {
             $this->loginView->setEmptyPasswordMessage();
         }
     }

@@ -13,16 +13,24 @@ class LoginView
 	private static $_login = 'LoginView::Login';
 	private static $_logout = 'LoginView::Logout';
 	private static $_message = 'LoginView::Message';
+	
+	// Session vars
+	private static $showWelcome = "showWelcome";
+	private static $showWelcomeKeep = "showWelcomeKeep";
+	private static $loggedInWithCookie = "loggedInWithCookie";
+	private static $showBye = "showBye";
+	private static $newUser = "newUser";
+	private static $newUsersName = "newUsersName";
 
-	private $modelMessage;
+	private $isLoggedIn;
 	private $userDB;
 
 	private $message;
 
-	public function __construct(\model\Message $m, \model\UserDB $db)
+	public function __construct(\model\LoggedInState $lis, \model\UserDB $db)
 	{
-		$this->modelMessage = $m;
 		$this->userDB = $db;
+		$this->isLoggedIn = $lis->getState();
 	}
 
 	/**
@@ -30,29 +38,35 @@ class LoginView
 	 */
 	public function response()
 	{
-		$this->setWelcomeMessage();
+		$this->setSessionMessage();
 
-		if ($_SESSION["loggedIn"]) {
+		if ($this->isLoggedIn) {
 			return $this->generateLogoutButtonHTML();
 		} else {
 			return $this->generateLoginFormHTML();
 		}
 	}
 
-	private function setWelcomeMessage()
+	private function setSessionMessage()
 	{
-		if (isset($_SESSION['showWelcome']) && $_SESSION['showWelcome']) {
+		if (isset($_SESSION[self::$showWelcome]) && $_SESSION[self::$showWelcome]) {
 			$this->message = "Welcome";
-		} else if (isset($_SESSION['showWelcomeKeep']) && $_SESSION['showWelcomeKeep']) {
+		} else if (isset($_SESSION[self::$showWelcomeKeep]) && $_SESSION[self::$showWelcomeKeep]) {
 			$this->message = "Welcome and you will be remembered";
-		} else if (isset($_SESSION['loggedInWithCookie']) && $_SESSION['loggedInWithCookie']) {
+		} else if (isset($_SESSION[self::$loggedInWithCookie]) && $_SESSION[self::$loggedInWithCookie]) {
 			$this->message = "Welcome back with cookie";
+		} else if (isset($_SESSION[self::$showBye]) && $_SESSION[self::$showBye]) {
+			$this->message = "Bye bye!";
+		} else if (isset($_SESSION[self::$newUser]) && $_SESSION[self::$newUser]) {
+			$this->message = "Registered new user.";
 		}
 
 		// Prevent message from showing twice
-		$_SESSION['showWelcome'] = false;
-		$_SESSION['showWelcomeKeep'] = false;
-		$_SESSION['loggedInWithCookie'] = false;
+		$_SESSION[self::$showWelcome] = false;
+		$_SESSION[self::$showWelcome] = false;
+		$_SESSION[self::$loggedInWithCookie] = false;
+		$_SESSION[self::$showBye] = false;
+		$_SESSION[self::$newUser] = false;
 	}
 
 	public function setEmptyUsernameMessage(): void
@@ -65,6 +79,16 @@ class LoginView
 		$this->message = "Password is missing";
 	}
 
+	public function setWrongUsernameOrPasswordMessage(): void
+	{
+		$this->message = "Wrong name or password";
+	}
+
+	public function setManipulatedCookiesMessage(): void
+	{
+		$this->message = "Wrong information in cookies";
+	}
+
 	public function userTriesToLogIn(): bool
 	{
 		if ($this->userClicksLoginButton()) {
@@ -74,6 +98,43 @@ class LoginView
 		}
 	}
 
+	public function setWelcomeSession(): void
+	{
+		$userCredentials = $this->getUserCredentials();
+
+		// If keep me logged in is checked
+		if ($userCredentials->getKeepLoggedIn()) {
+			$user = $this->userDB->getUser($userCredentials);
+
+			$this->setCookies($user);
+
+			$_SESSION[self::$showWelcomeKeep] = true;
+		} else {
+			$_SESSION[self::$showWelcome] = true;
+		}
+	}
+
+	public function setNewUserSession(): void
+	{
+		$_SESSION[self::$newUser] = true;
+	}
+
+	public function setNewUsersNameSession(string $name): void
+	{
+		$_SESSION[self::$newUsersName] = $name;
+	}
+
+
+	public function setLoggedInWithCookieSession(): void
+	{
+		$_SESSION[self::$loggedInWithCookie] = true;
+	}
+
+	public function setLogoutSession(): void
+	{
+		$_SESSION[self::$showBye] = true;
+	}
+
 	private function userClicksLoginButton(): bool
 	{
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_login])) {
@@ -81,25 +142,6 @@ class LoginView
 		} else {
 			return false;
 		}
-	}
-
-	public function setWelcomeSession(\model\UserCredentials $userCredentials): void
-	{
-		// If keep me logged in is checked
-		if ($userCredentials->getKeepLoggedIn()) {
-			$user = $this->userDB->getUser($userCredentials);
-
-			$this->setCookies($user);
-
-			$_SESSION['showWelcomeKeep'] = true;
-		} else {
-			$_SESSION['showWelcome'] = true;
-		}
-	}
-
-	public function setLoggedInWithCookieSession(): void
-	{
-		$_SESSION['loggedInWithCookie'] = true;
 	}
 
 	public function userWantsToLogOut(): bool
@@ -113,7 +155,7 @@ class LoginView
 
 	private function userClicksLogoutButton(): bool
 	{
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['LoginView::Logout'])) {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_logout])) {
 			return true;
 		} else {
 			return false;
@@ -181,7 +223,7 @@ class LoginView
 					<p id="' . self::$_message . '">' . $this->message . '</p>
 					
 					<label for="' . self::$_username . '">Username :</label>
-					<input type="text" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->modelMessage->getFormUsername() . '" />
+					<input type="text" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '" />
 
 					<label for="' . self::$_password . '">Password :</label>
 					<input type="password" id="' . self::$_password . '" name="' . self::$_password . '" />
@@ -193,5 +235,16 @@ class LoginView
 				</fieldset>
 			</form>
 		';
+	}
+
+	private function getFormUsernameInput(): string
+	{
+		if (isset($_POST[self::$_username])) {
+			return $_POST[self::$_username];
+		} else if (isset($_SESSION[self::$newUsersName])) {
+			return $_SESSION[self::$newUsersName];
+		} else {
+			return "";
+		}
 	}
 }

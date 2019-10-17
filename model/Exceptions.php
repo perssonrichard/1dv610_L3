@@ -1,4 +1,5 @@
 <?php
 
-class emptyUsernameException extends Exception {}
-class emptyPasswordException extends Exception {}
+// UserCredentials
+class EmptyUsernameException extends Exception {}
+class EmptyPasswordException extends Exception {}

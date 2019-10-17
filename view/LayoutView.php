@@ -4,7 +4,7 @@ namespace view;
 
 class LayoutView
 {
-  private $registerQueryString = 'register';
+  private static $registerQueryString = 'register';
 
   public function render($isLoggedIn, LoginView $loginView, RegisterView $registerView, DateTimeView $dtv)
   {
@@ -33,10 +33,10 @@ class LayoutView
    */
   private function linkToRender($isLoggedIn, LoginView $loginView, RegisterView $registerView)
   {
-    if (isset($_GET[$this->registerQueryString])) {
+    if (isset($_GET[self::$registerQueryString])) {
       return $registerView->generateBackToLoginHTML();
     } else if ($isLoggedIn == false) {
-      return $loginView->generateRegisterUserHTML($this->registerQueryString);
+      return $loginView->generateRegisterUserHTML(self::$registerQueryString);
     }
   }
 

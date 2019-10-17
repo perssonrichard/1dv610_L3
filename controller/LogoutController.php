@@ -7,12 +7,10 @@ use Config;
 class LogoutController
 {
     private $loginView;
-    private $handleSession;
 
-    public function __construct(\view\LoginView $lv, \model\HandleSession $hs)
+    public function __construct(\view\LoginView $lv)
     {
         $this->loginView = $lv;
-        $this->handleSession = $hs;
     }
 
     public function doLogout(): void
@@ -22,7 +20,8 @@ class LogoutController
         }
 
         session_unset();
-        $this->handleSession->setShowBye(true);
+
+        $this->loginView->setLogoutSession();
 
         header(Config::$redirectUrl);
         exit();

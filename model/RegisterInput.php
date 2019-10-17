@@ -2,6 +2,8 @@
 
 namespace model;
 
+use WrongRegisterInputException;
+
 class RegisterInput
 {
     private $username;
@@ -15,17 +17,17 @@ class RegisterInput
         $this->repeatPassword = $repeatPassword;
     }
 
-    public function getUsername() : string
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function getPassword() : string
+    public function getPassword(): string
     {
         return $this->password;
     }
 
-    public function getRepeatPassword() : string
+    public function getRepeatPassword(): string
     {
         return $this->repeatPassword;
     }

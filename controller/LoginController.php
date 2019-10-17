@@ -8,18 +8,18 @@ class LoginController
 {
     private $loginView;
     private $userDB;
-    private $handleSession;
+    private $loggedInState;
 
     /**
      * @var \model\UserCredentials
      */
     private $userCredentials;
 
-    public function __construct(\view\LoginView $lv, \model\UserDB $db, \model\HandleSession $hs)
+    public function __construct(\view\LoginView $lv, \model\UserDB $db, \model\LoggedInState $lis)
     {
         $this->loginView = $lv;
         $this->userDB = $db;
-        $this->handleSession = $hs;
+        $this->loggedInState = $lis;
     }
 
     public function doLoginAttempt(): void
@@ -27,13 +27,15 @@ class LoginController
         $this->userCredentials = $this->loginView->getUserCredentials();
 
         if ($this->loginInputIsCorrect()) {
-            $this->loginView->setWelcomeSession($this->userCredentials);
+            $this->loginView->setWelcomeSession();
 
-            $this->handleSession->setLoggedIn(true);
-            $this->handleSession->setValidationString($this->loginView->getValidationString());
+            $this->loggedInState->setState(true);
+            $this->loggedInState->setSessionValidation($this->loginView->getValidationString());
 
             header(Config::$redirectUrl);
             exit();
+        } else {
+            $this->loginView->setWrongUsernameOrPasswordMessage();
         }
     }
 
@@ -43,28 +45,21 @@ class LoginController
 
         if ($this->userDB->validateCookies($user)) {
             $this->loginView->setLoggedInWithCookieSession();
-            $this->handleSession->setLoggedIn(true);
+            $this->loggedInState->setState(true);
         } else {
-            $this->handleSession->setManipulatedCookie(true);
+            $this->loginView->setManipulatedCookiesMessage();
+            $this->loginView->deleteCookies();
         }
     }
 
     private function loginInputIsCorrect(): bool
     {
-        // $usernameIsEmpty = empty($this->userCredentials->getUsername());
-        // $passwordIsEmpty = empty($this->userCredentials->getPassword());
-        // $databaseHasUser = $this->userDB->hasUser($this->userCredentials->getUsername());
-
-        // if ($usernameIsEmpty || $passwordIsEmpty || $databaseHasUser == false) {
-        //     return false;
-        // } else if ($this->userDB->verifyPassword($this->userCredentials)) {
-        //     return true;
-        // } else {
-        //     return false;
-        // }
-
-        if ($this->userDB->verifyPassword($this->userCredentials)) {
-            return true;
+        if ($this->userDB->hasUser($this->userCredentials->getUsername())) {
+            if ($this->userDB->verifyPassword($this->userCredentials)) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
