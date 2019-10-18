@@ -91,7 +91,7 @@ class LoginView
 
 	public function userTriesToLogIn(): bool
 	{
-		if ($this->userClicksLoginButton()) {
+		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_login])) {
 			return true;
 		} else {
 			return false;
@@ -135,25 +135,7 @@ class LoginView
 		$_SESSION[self::$showBye] = true;
 	}
 
-	private function userClicksLoginButton(): bool
-	{
-		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_login])) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
 	public function userWantsToLogOut(): bool
-	{
-		if ($this->userClicksLogoutButton()) {
-			return true;
-		} else {
-			return false;
-		}
-	}
-
-	private function userClicksLogoutButton(): bool
 	{
 		if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$_logout])) {
 			return true;

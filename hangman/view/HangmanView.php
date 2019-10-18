@@ -4,13 +4,18 @@ namespace hangmanView;
 
 class HangmanView
 {
-    private static $_guess = "HangmanView::Guess";
-    private static $_submit = "HangmanView::SubmitGuess";
+    private static $guess = "HangmanView::Guess";
+    private static $submit = "HangmanView::SubmitGuess";
+    private static $message = "HangmanView::Message";
 
     private $game;
 
     public function __construct(\hangmanModel\HangmanGame $game)
     {
+        if (isset($_SESSION[self::$message]) == false) {
+            $_SESSION[self::$message] = "";
+        }
+
         $this->game = $game;
     }
 
@@ -21,16 +26,38 @@ class HangmanView
 
         <form method="post" > 
         <fieldset>            
-            <label for="' . self::$_guess . '">Your Guess :</label>
-            <input type="text" id="' . self::$_guess . '" name="' . self::$_guess . '" value="" />
-            <input type="submit" name="' . self::$_submit . '" value="Submit Guess" />
+            <label for="' . self::$guess . '">Your Guess :</label>
+            <input type="text" id="' . self::$guess . '" name="' . self::$guess . '" value="" />
+            <input type="submit" name="' . self::$submit . '" value="Submit Guess" />
         </fieldset>
     </form>
-
-        ' . $this->showWord() . '
+        <p>' . $_SESSION[self::$message] . '</p>
+        <p>' . $this->showWord() . '</p>
 
         </div>
         ';
+    }
+
+    public function setCorrectGuessMessage(): void {
+        $_SESSION[self::$message] = "Correct guess!";
+    }
+
+    public function setWrongGuessMessage(): void {
+        $_SESSION[self::$message] = "Wrong guess! :(";
+    }
+
+    public function playerIsTryingToGuessLetter(): bool
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$submit])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function getGuessedLetter(): \hangmanModel\GuessedLetter
+    {
+        return new \hangmanModel\GuessedLetter($_POST[self::$guess]);
     }
 
     private function showGuessedLetters(): string
@@ -38,12 +65,12 @@ class HangmanView
         $letters = $this->game->getAllGuessedLetters();
         $letterString = "";
 
-        foreach($letters as $letter) {
+        foreach ($letters as $letter) {
             $letterString .= "$letter, ";
         }
 
         return $letterString;
-    } 
+    }
 
     private function showWord(): string
     {
@@ -52,7 +79,7 @@ class HangmanView
 
         $wordString = "";
 
-        foreach(str_split($word) as $letter) {
+        foreach (str_split($word) as $letter) {
             if (in_array($letter, $correctGuessedLetters, true)) {
                 $wordString .= $letter;
             } else {

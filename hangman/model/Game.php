@@ -2,101 +2,107 @@
 
 namespace hangmanModel;
 
-require_once("HangedMan.php");
-require_once("Words.php");
+use AlreadyGuessedLetterException;
 
 class HangmanGame
 {
     // Define session variables
-    private static $_word = "wordToBeGuessed";
-    private static $_correctLetters = "correctLetters";
-    private static $_wrongLetters = "wrongLetters";
-    private static $_allLetters = "allLetters";
-    private static $_numberOfGuesses = "numberOfGuesses";
+    private static $wordToBeGuessed = "wordToBeGuessed";
+    private static $correctGuessedLetters = "correctLetters";
+    private static $allGuessedLetters = "allLetters";
+    private static $numberOfGuesses = "numberOfGuesses";
+    private static $guessIsCorrect = "guessIsRight";
 
     private static $maxNumberOfGuesses = 10;
 
-    private $wordToBeGuessed;
-
-    private $correctGuessedLetters;
-    private $wrongGuessedLetters;
-    private $allGuessedLetters;
-
-    private $numberOfGuesses;
-
     public function __construct()
     {
-        // Get word if game is running, else get a new word
-        if (isset($_SESSION[self::$_word])) {
-            $this->wordToBeGuessed = $_SESSION[self::$_word];
-        } else {
+        /**
+         * Set sessions if they do not exist
+         */
+        if (isset($_SESSION[self::$wordToBeGuessed]) == false) {
             $words = new Words();
-
-            $this->wordToBeGuessed = $words->getRandomWord();
-            $_SESSION[self::$_word] = $this->wordToBeGuessed;
+            $_SESSION[self::$wordToBeGuessed] = $words->getRandomWord();
         }
-
-        // Get correct guessed letters if game is running
-        if (isset($_SESSION[self::$_correctLetters])) {
-            $this->correctGuessedLetters = $_SESSION[self::$_correctLetters];
-        } else {
-            $this->correctGuessedLetters = array();
+        if (isset($_SESSION[self::$correctGuessedLetters]) == false) {
+            $_SESSION[self::$correctGuessedLetters] = array();
         }
-
-        // Get wrong guessed letters if game is running
-        if (isset($_SESSION[self::$_wrongLetters])) {
-            $this->wrongGuessedLetters = $_SESSION[self::$_wrongLetters];
-        } else {
-            $this->wrongGuessedLetters = array();
+        if (isset($_SESSION[self::$allGuessedLetters]) == false) {
+            $_SESSION[self::$allGuessedLetters] = array();
         }
-
-        // Get all guessed letters if game is running
-        if (isset($_SESSION[self::$_allLetters])) {
-            $this->allGuessedLetters = $_SESSION[self::$_allLetters];
-        } else {
-            $this->allGuessedLetters = array();
+        if (isset($_SESSION[self::$numberOfGuesses]) == false) {
+            $_SESSION[self::$numberOfGuesses] = 0;
         }
-
-        // Get number of guesses if game is running
-        if (isset($_SESSION[self::$_numberOfGuesses])) {
-            $this->numberOfGuesses = $_SESSION[self::$_numberOfGuesses];
-        } else {
-            $this->numberOfGuesses = 0;
+        if (isset($_SESSION[self::$guessIsCorrect]) == false) {
+            $this->guessIsRight = $_SESSION[self::$guessIsCorrect] = false;
         }
-    }
-
-    public function addLetter(string $letter): void {
-        
     }
 
     public function getWord(): string
     {
-        return $this->wordToBeGuessed;
+        return $_SESSION[self::$wordToBeGuessed];
     }
 
     public function getCorrectGuessedLetters(): array
     {
-        return $this->correctGuessedLetters;
-    }
-
-    public function getWrongGuessedLetters(): array
-    {
-        return $this->wrongGuessedLetters;
+        return $_SESSION[self::$correctGuessedLetters];
     }
 
     public function getAllGuessedLetters(): array
     {
-        return $this->allGuessedLetters;
+        return $_SESSION[self::$allGuessedLetters];
     }
 
-    public function isAlreadyGuessed(string $letter): bool
+    public function doGuessLetter(GuessedLetter $guessedLetter): void
     {
-        foreach ($this->allGuessedLetters as $value) {
+        $letter = $guessedLetter->getLetter();
+
+        if ($this->isAlreadyGuessed($letter)) {
+            throw new AlreadyGuessedLetterException();
+        }
+
+        if ($this->isCorrectLetter($letter)) {
+            $this->doCorrectLetter($letter);
+        } else {
+            $this->doWrongLetter();
+        }
+
+        array_push($_SESSION[self::$allGuessedLetters], $letter);
+    }
+
+    public function guessIsCorrect(): bool
+    {
+        return $_SESSION[self::$guessIsCorrect];
+    }
+
+    private function isAlreadyGuessed(string $letter): bool
+    {
+        foreach ($_SESSION[self::$allGuessedLetters] as $value) {
             if ($value == $letter) {
                 return true;
             }
         }
-
         return false;
+    }
+
+    private function isCorrectLetter(string $letter): bool
+    {
+        if (stristr($_SESSION[self::$wordToBeGuessed], $letter)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private function doCorrectLetter(string $letter): void
+    {
+        array_push($_SESSION[self::$correctGuessedLetters], $letter);
+        $_SESSION[self::$guessIsCorrect] = true;
+    }
+
+    private function doWrongLetter(): void
+    {
+        $_SESSION[self::$numberOfGuesses] += 1;
+        $_SESSION[self::$guessIsCorrect] = false;
     }
 }
