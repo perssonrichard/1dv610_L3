@@ -4,7 +4,7 @@ namespace controller;
 
 class RegisterController
 {
-    private static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/L3/index.php';
+    private static $redirectUrl = 'Location: index.php';
 
     private $registerView;
     private $userDB;

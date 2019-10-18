@@ -4,7 +4,7 @@ namespace controller;
 
 class LogoutController
 {
-    private static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/L3/index.php';
+    private static $redirectUrl = 'Location: index.php';
     private $loginView;
 
     public function __construct(\view\LoginView $lv)

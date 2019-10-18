@@ -4,7 +4,7 @@ namespace controller;
 
 class LoginController
 {
-    private static $redirectUrl = 'Location: https://perssonrichard.com/1dv610/L3/index.php';
+    private static $redirectUrl = 'Location: index.php';
 
     private $loginView;
     private $userDB;

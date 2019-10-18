@@ -23,6 +23,8 @@ require_once('controller/LogoutController.php');
 require_once('controller/MasterController.php');
 require_once('controller/RegisterController.php');
 
+require_once('hangman/Application.php');
+
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -37,6 +39,10 @@ $layoutView = new \view\LayoutView();
 
 $masterController = new \controller\MasterController($loggedInState, $userDB, $loginView, $registerView);
 
+$hangman = new \hangman\Application();
+
 $masterController->run();
 
-$layoutView->render($loggedInState->getState(), $loginView, $registerView, $dateTimeView);
+$layoutView->render($loggedInState->getState(), $loginView, $registerView, $dateTimeView, $hangman);
+
+var_dump($_SESSION);
