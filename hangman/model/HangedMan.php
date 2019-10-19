@@ -133,12 +133,6 @@ class HangedMan
 
             case 8:
                 return self::$eight;
-
-            case 9:
-                return self::$nine;
-
-            case 10:
-                return self::$ten;
         }
     }
 }

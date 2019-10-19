@@ -90,29 +90,23 @@ class RegisterView
     private function generateRegisterFormHTML()
     {
         return '
-        <h2>Register new user</h2>
-        <form action="?register" method="post" enctype="multipart/form-data">
+        <form action="?' . UrlView::$registerQueryString . '" method="post" enctype="multipart/form-data">
+        <fieldset>
 				<legend>Register a new user - Write username and password</legend>
                     <p id="' . self::$_message . '">' . $this->message . '</p>
                     
-                    <div class="form-group">
-					<label for="' . self::$_username . '">Username :</label>
-					<input type="text" class="form-control form-control-sm" size="20" name="' . self::$_username . '" id="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '">
-                    </div>
+					<label for="' . self::$_username . '">Username</label>
+					<input type="text" class="form-control" size="20" name="' . self::$_username . '" id="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '">
 
-                    <div class="form-group">
-					<label for="' . self::$_password . '">Password  :</label>
-					<input type="password" class="form-control form-control-sm" size="20" name="' . self::$_password . '" id="' . self::$_password . '" value="">
-                    </div>
+					<label for="' . self::$_password . '">Password</label>
+					<input type="password" class="form-control" size="20" name="' . self::$_password . '" id="' . self::$_password . '" value="">
                     
-                    <div class="form-group">
-					<label for="' . self::$_password . 'Repeat">Repeat password  :</label>
-					<input type="password" class="form-control form-control-sm" size="20" name="' . self::$_password . 'Repeat" id="' . self::$_password . 'Repeat" value="">
-					</div>
-					<input id="submit" type="submit" name="' . self::$_register . '" value="Register">
-					<br>
-            </form>
-        </div>
+					<label for="' . self::$_password . 'Repeat">Repeat password</label>
+					<input type="password" class="form-control" size="20" name="' . self::$_password . 'Repeat" id="' . self::$_password . 'Repeat" value="">
+                    
+                    <input id="submit" class="btn btn-outline-primary mt-2 w-25" type="submit" name="' . self::$_register . '" value="Register">
+        </fieldset>            
+        </form>
             ';
     }
 

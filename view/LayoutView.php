@@ -16,15 +16,17 @@ class LayoutView
           <title>Login Example</title>
         </head>
         <body>
-        <div class="container">
-          <h1>Assignment 3</h1>
+        <div class="container border-left border-right p-2">
+          <h1>The Hangman Game</h1>
           ' . $this->linkToRender($isLoggedIn, $loginView, $registerView) . '
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
         </div>
-          <div class="container">
+          <div class="container border-left border-right border-bottom p-2  ">
               ' . $this->viewToRender($loginView, $registerView) . '
               ' . $this->renderHangman($isLoggedIn, $hangman) . '
+              <div class="container fixed-bottom border">
               ' . $dtv->show() . '
+              </div>
           </div>
          </body>
       </html>

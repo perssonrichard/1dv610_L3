@@ -16,6 +16,8 @@ class controller
     public function run()
     {
         try {
+            $this->view->unsetMessage();
+
             $this->guessLetter();
         } catch (\hangmanModel\GuessIsNotOneLetterException $e) {
             $this->view->setOnlyOneLetterMessage();

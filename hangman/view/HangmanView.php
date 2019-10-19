@@ -23,12 +23,22 @@ class HangmanView
     public function showGame(): string
     {
         return '
-        <div class="container">
-            <pre>' . $this->game->getHangedMan() . '</pre>
-            <p>' . $this->showWord() . '</p>
-            <p>Guessed letters: ' . $this->showGuessedLetters() . '</p>
-            ' . $this->showForm() . '
-            <p>' . $_SESSION[self::$message] . '</p>
+        <div class="d-flex justify-content-center">
+        <div class="mt-3 w-50">
+            <div class="border p-1">
+                <div class="bg-dark p-0">
+                    <pre class="text-white p-2">' . $this->game->getHangedMan() . '</pre>
+                </div>
+            
+                <p class="text-center">' . $this->showWord() . '</p>
+                <p class="text-center">' . $_SESSION[self::$message] . '</p>
+
+
+                <p class="text-center">Guessed letters</p> 
+                <p class="text-center">' . $this->showGuessedLetters() . '</p>
+                ' . $this->showForm() . '
+            </div>
+        </div>
         </div>
         ';
     }
@@ -115,15 +125,15 @@ class HangmanView
     {
         if ($this->game->isGameOver() || $this->game->isWin()) {
             return '
-        <form  method="post" >
-			<input type="submit" name="' . self::$restart . '" value="restart"/>
+        <form method="post" >
+			<input type="submit" class="btn btn-outline-dark mt-2" name="' . self::$restart . '" value="Restart"/>
 		</form>
         ';
         } else {
             return '
-        <form method="post" > 
-            <input type="text" id="' . self::$guess . '" name="' . self::$guess . '" value="" />
-            <input type="submit" name="' . self::$submit . '" value="Guess" />
+        <form class="text-center" method="post" > 
+            <input type="text" class="form-control" id="' . self::$guess . '" name="' . self::$guess . '" value="" />
+            <input type="submit" class="btn btn-outline-dark mt-2" name="' . self::$submit . '" value="Guess" />
         </form>
         ';
         }

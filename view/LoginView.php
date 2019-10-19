@@ -13,7 +13,7 @@ class LoginView
 	private static $_login = 'LoginView::Login';
 	private static $_logout = 'LoginView::Logout';
 	private static $_message = 'LoginView::Message';
-	
+
 	// Session vars
 	private static $showWelcome = "showWelcome";
 	private static $showWelcomeKeep = "showWelcomeKeep";
@@ -170,7 +170,7 @@ class LoginView
 
 	public function setCookies(\model\User $user): void
 	{
-		// 86400 * 30 = 24 hours
+		// 86400 * 30 = 30 days
 		setcookie(self::$_cookieName, $user->getUsername(), time() + (86400 * 30));
 		setcookie(self::$_cookiePassword, $user->getCookiePassword(), time() + (86400 * 30));
 	}
@@ -189,9 +189,9 @@ class LoginView
 	private function generateLogoutButtonHTML()
 	{
 		return '
-			<form  method="post" >
+			<form method="post" >
 				<p id="' . self::$_message . '">' . $this->message . '</p>
-				<input type="submit" name="' . self::$_logout . '" value="logout"/>
+				<input class="btn btn-outline-primary" type="submit" name="' . self::$_logout . '" value="Logout"/>
 			</form>
 		';
 	}
@@ -200,30 +200,22 @@ class LoginView
 	{
 		return '
 			<form method="post" >
+			<fieldset>
 				<legend>Login - enter Username and password</legend>
-				<p id="' . self::$_message . '">' . $this->message . '</p>
+					<p id="' . self::$_message . '">' . $this->message . '</p>
 
-			<div class="form-row"> 
-				<div class="form-group col">
 					<label for="' . self::$_username . '">Username</label>
 					<input type="text" class="form-control" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '" />
-				</div>
 
-				<div class="form-group col">
 					<label for="' . self::$_password . '">Password</label>
 					<input type="password" class="form-control" id="' . self::$_password . '" name="' . self::$_password . '" />
-				</div>
-			</div>
-
-				<div class="form-group">
-					<div class="form-check">
-						<label class="form-check-label" for="' . self::$_keep . '">Keep me logged in :</label>
-						<input class="form-check-input" type="checkbox" id="' . self::$_keep . '" name="' . self::$_keep . '" />
-					</div>
-				</div>
-
-					<input type="submit" class="btn btn-primary" name="' . self::$_login . '" value="login" />
-			
+					
+					<input type="checkbox" id="' . self::$_keep . '" name="' . self::$_keep . '" />
+					<label class="form-check-label" for="' . self::$_keep . '">Keep me logged in</label>
+					<br>
+					
+					<input type="submit" class="btn btn-outline-primary mt-2 w-25" name="' . self::$_login . '" value="Login" />
+			</fieldset>
 			</form>
 		';
 	}

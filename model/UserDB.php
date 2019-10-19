@@ -9,18 +9,18 @@ class UserDB
     /**
      * LOCAL SERVER CONNECTION
      */
-    // private static $dbServerName = "localhost";
-    // private static $dbUsername = "root";
-    // private static $dbPassword = "";
-    // private static $dbName = "loginsystem";
+    private static $dbServerName = "localhost";
+    private static $dbUsername = "root";
+    private static $dbPassword = "";
+    private static $dbName = "loginsystem";
 
     /**
      * REMOTE SERVER CONNECTION
      */
-    private static $dbServerName = "localhost";
-    private static $dbUsername = "persglgr_root";
-    private static $dbPassword = "pa)gYnW99x*j";
-    private static $dbName = "persglgr_loginsystem_L3";
+    // private static $dbServerName = "localhost";
+    // private static $dbUsername = "persglgr_root";
+    // private static $dbPassword = "pa)gYnW99x*j";
+    // private static $dbName = "persglgr_loginsystem_L3";
 
     /**
      * MYSQL TABLE INFORMATION

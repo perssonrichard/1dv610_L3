@@ -14,7 +14,7 @@ class HangmanGame
     private static $numberOfGuesses = "numberOfGuesses";
     private static $guessIsCorrect = "guessIsRight";
 
-    private static $maxNumberOfGuesses = 10;
+    private static $maxNumberOfGuesses = 8;
 
     public function __construct()
     {
