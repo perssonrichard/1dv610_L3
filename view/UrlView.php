@@ -11,7 +11,7 @@ class UrlView
     /**
      * TODO: These statics should definitely not be public.
      */
-    public static $redirect = "Location: index.php";
+    public static $redirect = "Location: https://perssonrichard.com/1dv610/L3/index.php";
     public static $registerQueryString = 'register';
 
     /**
