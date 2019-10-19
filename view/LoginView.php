@@ -199,22 +199,31 @@ class LoginView
 	private function generateLoginFormHTML()
 	{
 		return '
-			<form method="post" > 
-				<fieldset>
-					<legend>Login - enter Username and password</legend>
-					<p id="' . self::$_message . '">' . $this->message . '</p>
-					
-					<label for="' . self::$_username . '">Username :</label>
-					<input type="text" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '" />
+			<form method="post" >
+				<legend>Login - enter Username and password</legend>
+				<p id="' . self::$_message . '">' . $this->message . '</p>
 
-					<label for="' . self::$_password . '">Password :</label>
-					<input type="password" id="' . self::$_password . '" name="' . self::$_password . '" />
+			<div class="form-row"> 
+				<div class="form-group col">
+					<label for="' . self::$_username . '">Username</label>
+					<input type="text" class="form-control" id="' . self::$_username . '" name="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '" />
+				</div>
 
-					<label for="' . self::$_keep . '">Keep me logged in  :</label>
-					<input type="checkbox" id="' . self::$_keep . '" name="' . self::$_keep . '" />
-					
-					<input type="submit" name="' . self::$_login . '" value="login" />
-				</fieldset>
+				<div class="form-group col">
+					<label for="' . self::$_password . '">Password</label>
+					<input type="password" class="form-control" id="' . self::$_password . '" name="' . self::$_password . '" />
+				</div>
+			</div>
+
+				<div class="form-group">
+					<div class="form-check">
+						<label class="form-check-label" for="' . self::$_keep . '">Keep me logged in :</label>
+						<input class="form-check-input" type="checkbox" id="' . self::$_keep . '" name="' . self::$_keep . '" />
+					</div>
+				</div>
+
+					<input type="submit" class="btn btn-primary" name="' . self::$_login . '" value="login" />
+			
 			</form>
 		';
 	}

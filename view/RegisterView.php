@@ -92,22 +92,27 @@ class RegisterView
         return '
         <h2>Register new user</h2>
         <form action="?register" method="post" enctype="multipart/form-data">
-				<fieldset>
 				<legend>Register a new user - Write username and password</legend>
-					<p id="' . self::$_message . '">' . $this->message . '</p>
+                    <p id="' . self::$_message . '">' . $this->message . '</p>
+                    
+                    <div class="form-group">
 					<label for="' . self::$_username . '">Username :</label>
-					<input type="text" size="20" name="' . self::$_username . '" id="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '">
-					<br>
+					<input type="text" class="form-control form-control-sm" size="20" name="' . self::$_username . '" id="' . self::$_username . '" value="' . $this->getFormUsernameInput() . '">
+                    </div>
+
+                    <div class="form-group">
 					<label for="' . self::$_password . '">Password  :</label>
-					<input type="password" size="20" name="' . self::$_password . '" id="' . self::$_password . '" value="">
-					<br>
+					<input type="password" class="form-control form-control-sm" size="20" name="' . self::$_password . '" id="' . self::$_password . '" value="">
+                    </div>
+                    
+                    <div class="form-group">
 					<label for="' . self::$_password . 'Repeat">Repeat password  :</label>
-					<input type="password" size="20" name="' . self::$_password . 'Repeat" id="' . self::$_password . 'Repeat" value="">
-					<br>
+					<input type="password" class="form-control form-control-sm" size="20" name="' . self::$_password . 'Repeat" id="' . self::$_password . 'Repeat" value="">
+					</div>
 					<input id="submit" type="submit" name="' . self::$_register . '" value="Register">
 					<br>
-				</fieldset>
             </form>
+        </div>
             ';
     }
 
