@@ -4,30 +4,8 @@ namespace hangmanModel;
 
 class HangedMan
 {
-    private static $one =
+    private static $zero =
     '
-     
-     
-     
-     
-     
-      
-    
-    -------------';
-
-    private static $two =
-    '
-     |
-     |
-     |
-     |
-     |
-     | 
-    /|\
-    -------------';
-
-    private static $three =
-    ' -------
      |/
      |
      |
@@ -37,41 +15,52 @@ class HangedMan
     /|\
     -------------';
 
-    private static $four =
-    ' -------
+    private static $one =
+    '     ________
+     |/
+     |
+     |
+     |
+     |
+     | 
+    /|\
+    -------------';
+
+    private static $two =
+    '     ________
      |/    | 
      |
      |
      |
+     |
+     | 
+    /|\
+    -------------';
+
+    private static $three =
+    '     ________
+     |/    | 
+     |     o
+     |
+     |
+     |
+     | 
+    /|\
+    -------------';
+
+    private static $four =
+    '     ________
+     |/    | 
+     |     o
+     |     |
+     |     |
      |
      | 
     /|\
     -------------';
 
     private static $five =
-    ' -------
-     |/    | 
-     |     o
-     |
-     |
-     |
-     | 
-    /|\
-    -------------';
-
-    private static $six =
-    ' -------
-     |/    | 
-     |     o
-     |     |
-     |     |
-     |
-     | 
-    /|\
-    -------------';
-
-    private static $seven =
-    ' -------
+    '     ________
      |/    | 
      |     o
      |     |
@@ -81,8 +70,8 @@ class HangedMan
     /|\
     -------------';
 
-    private static $eight =
-    ' -------
+    private static $six =
+    '     ________
      |/    | 
      |     o
      |     |
@@ -92,8 +81,8 @@ class HangedMan
     /|\
     -------------';
 
-    private static $nine =
-    ' -------
+    private static $seven =
+    '     ________
      |/    | 
      |     o
      |   --|
@@ -103,8 +92,8 @@ class HangedMan
     /|\
     -------------';
 
-    private static $ten =
-    ' -------
+    private static $eight =
+    '     ________
      |/    | 
      |     o
      |   --|--
@@ -115,40 +104,41 @@ class HangedMan
     -------------';
 
 
-    public function wrongGuess(int $guessNumber): string
+    public function getHangedMan(int $guessNumber): string
     {
-        switch ($guessNumber)
-        {
+        switch ($guessNumber) {
+            case 0:
+                return self::$zero;
+
             case 1:
-            return self::$one;
-            
+                return self::$one;
+
             case 2:
-            return self::$two;
+                return self::$two;
 
             case 3:
-            return self::$three;
+                return self::$three;
 
             case 4:
-            return self::$four;
+                return self::$four;
 
             case 5:
-            return self::$five;
+                return self::$five;
 
             case 6:
-            return self::$six;
+                return self::$six;
 
             case 7:
-            return self::$seven;
+                return self::$seven;
 
             case 8:
-            return self::$eight;
+                return self::$eight;
 
             case 9:
-            return self::$nine;
+                return self::$nine;
 
             case 10:
-            return self::$ten;
+                return self::$ten;
         }
     }
-
 }

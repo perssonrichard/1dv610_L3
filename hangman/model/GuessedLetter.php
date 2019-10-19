@@ -2,7 +2,7 @@
 
 namespace hangmanModel;
 
-use GuessIsNotOneLetterException;
+class GuessIsNotOneLetterException extends \Exception {}
 
 class GuessedLetter
 {
@@ -14,7 +14,7 @@ class GuessedLetter
             throw new GuessIsNotOneLetterException();
         }
 
-        $this->letter = $letter;
+        $this->letter = strtolower($letter);
     }
 
     public function getLetter(): string

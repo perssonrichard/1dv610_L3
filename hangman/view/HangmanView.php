@@ -7,6 +7,7 @@ class HangmanView
     private static $guess = "HangmanView::Guess";
     private static $submit = "HangmanView::SubmitGuess";
     private static $message = "HangmanView::Message";
+    private static $restart = "HangmanView::Restart";
 
     private $game;
 
@@ -23,32 +24,52 @@ class HangmanView
     {
         return '
         <div class="container">
-
-        <form method="post" > 
-        <fieldset>            
-            <label for="' . self::$guess . '">Your Guess :</label>
-            <input type="text" id="' . self::$guess . '" name="' . self::$guess . '" value="" />
-            <input type="submit" name="' . self::$submit . '" value="Submit Guess" />
-        </fieldset>
-    </form>
-        <p>' . $_SESSION[self::$message] . '</p>
-        <p>' . $this->showWord() . '</p>
-
+            <pre>' . $this->game->getHangedMan() . '</pre>
+            <p>' . $this->showWord() . '</p>
+            <p>Guessed letters: ' . $this->showGuessedLetters() . '</p>
+            ' . $this->showForm() . '
+            <p>' . $_SESSION[self::$message] . '</p>
         </div>
         ';
     }
 
-    public function setCorrectGuessMessage(): void {
-        $_SESSION[self::$message] = "Correct guess!";
+    public function setWinMessage(): void
+    {
+        $_SESSION[self::$message] = 'You win! You had ' . $this->game->getAttemptsLeft() . ' attempts left!';
     }
 
-    public function setWrongGuessMessage(): void {
-        $_SESSION[self::$message] = "Wrong guess! :(";
+    public function setLoseMessage(): void
+    {
+        $_SESSION[self::$message] = 'Sorry, you lost. The correct word is ' . $this->game->getWord() . '.';
+    }
+
+    public function setOnlyOneLetterMessage(): void
+    {
+        $_SESSION[self::$message] = "Only one letter is allowed.";
+    }
+
+    public function setLetterAlreadyGuessedMessage(): void
+    {
+        $_SESSION[self::$message] = "Letter has already been guessed.";
+    }
+
+    public function unsetMessage(): void
+    {
+        $_SESSION[self::$message] = "";
     }
 
     public function playerIsTryingToGuessLetter(): bool
     {
         if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$submit])) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function playerIsTryingToRestart(): bool
+    {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST[self::$restart])) {
             return true;
         } else {
             return false;
@@ -88,5 +109,23 @@ class HangmanView
         }
 
         return $wordString;
+    }
+
+    private function showForm(): string
+    {
+        if ($this->game->isGameOver() || $this->game->isWin()) {
+            return '
+        <form  method="post" >
+			<input type="submit" name="' . self::$restart . '" value="restart"/>
+		</form>
+        ';
+        } else {
+            return '
+        <form method="post" > 
+            <input type="text" id="' . self::$guess . '" name="' . self::$guess . '" value="" />
+            <input type="submit" name="' . self::$submit . '" value="Guess" />
+        </form>
+        ';
+        }
     }
 }

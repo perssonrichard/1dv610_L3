@@ -61,7 +61,7 @@ class LoginView
 			$this->message = "Registered new user.";
 		}
 
-		// Prevent message from showing twice
+		// Prevent message from showing again on refresh
 		$_SESSION[self::$showWelcome] = false;
 		$_SESSION[self::$showWelcomeKeep] = false;
 		$_SESSION[self::$loggedInWithCookie] = false;

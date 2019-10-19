@@ -2,9 +2,6 @@
 
 namespace hangmanController;
 
-use AlreadyGuessedLetterException;
-use GuessIsNotOneLetterException;
-
 class controller
 {
     private $view;
@@ -19,19 +16,31 @@ class controller
     public function run()
     {
         try {
-            if ($this->view->playerIsTryingToGuessLetter()) {
-                $this->game->doGuessLetter($this->view->getGuessedLetter());
+            $this->guessLetter();
+        } catch (\hangmanModel\GuessIsNotOneLetterException $e) {
+            $this->view->setOnlyOneLetterMessage();
+        } catch (\hangmanModel\AlreadyGuessedLetterException $e) {
+            $this->view->setLetterAlreadyGuessedMessage();
+        }
 
-                if ($this->game->guessIsCorrect()) {
-                    $this->view->setCorrectGuessMessage();
-                } else {
-                    $this->view->setWrongGuessMessage();
+        if ($this->view->playerIsTryingToRestart()) {
+            $this->game->doRestartGame();
+            $this->view->unsetMessage();
+        }
+    }
+
+    private function guessLetter(): void
+    {
+        if ($this->view->playerIsTryingToGuessLetter()) {
+            $this->game->doGuessLetter($this->view->getGuessedLetter());
+
+            if ($this->game->isGuessCorrect()) {
+                if ($this->game->isWin()) {
+                    $this->view->setWinMessage();
                 }
+            } else if ($this->game->isGameOver()) {
+                $this->view->setLoseMessage();
             }
-        } catch (GuessIsNotOneLetterException $e) {
-
-        } catch (AlreadyGuessedLetterException $e) {
-
         }
     }
 }

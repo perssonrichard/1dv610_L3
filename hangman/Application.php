@@ -2,11 +2,9 @@
 
 namespace hangman;
 
-
 require_once("model/Game.php");
 require_once("model/HangedMan.php");
 require_once("model/Words.php");
-require_once("model/Exceptions.php");
 require_once("model/GuessedLetter.php");
 require_once("controller/Controller.php");
 require_once("view/HangmanView.php");

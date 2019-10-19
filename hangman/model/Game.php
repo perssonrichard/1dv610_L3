@@ -2,7 +2,8 @@
 
 namespace hangmanModel;
 
-use AlreadyGuessedLetterException;
+class AlreadyGuessedLetterException extends \Exception
+{ }
 
 class HangmanGame
 {
@@ -34,7 +35,7 @@ class HangmanGame
             $_SESSION[self::$numberOfGuesses] = 0;
         }
         if (isset($_SESSION[self::$guessIsCorrect]) == false) {
-            $this->guessIsRight = $_SESSION[self::$guessIsCorrect] = false;
+            $_SESSION[self::$guessIsCorrect] = false;
         }
     }
 
@@ -51,6 +52,18 @@ class HangmanGame
     public function getAllGuessedLetters(): array
     {
         return $_SESSION[self::$allGuessedLetters];
+    }
+
+    public function getHangedMan(): string
+    {
+        $hangedMan = new HangedMan();
+
+        return $hangedMan->getHangedMan($_SESSION[self::$numberOfGuesses]);
+    }
+
+    public function getAttemptsLeft(): int
+    {
+        return self::$maxNumberOfGuesses - $_SESSION[self::$numberOfGuesses];
     }
 
     public function doGuessLetter(GuessedLetter $guessedLetter): void
@@ -70,9 +83,49 @@ class HangmanGame
         array_push($_SESSION[self::$allGuessedLetters], $letter);
     }
 
-    public function guessIsCorrect(): bool
+    public function doRestartGame(): void
+    {
+    $words = new Words();
+
+    $_SESSION[self::$wordToBeGuessed] = $words->getRandomWord();
+    $_SESSION[self::$correctGuessedLetters] = array();
+    $_SESSION[self::$allGuessedLetters] = array();
+    $_SESSION[self::$numberOfGuesses] = 0;
+    $_SESSION[self::$guessIsCorrect] = false;
+    }
+
+    public function isGuessCorrect(): bool
     {
         return $_SESSION[self::$guessIsCorrect];
+    }
+
+    public function isGameOver(): bool
+    {
+        if ($_SESSION[self::$numberOfGuesses] == self::$maxNumberOfGuesses) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function isWin(): bool
+    {
+        $word = "";
+
+        // Check if word can be formed with guessed letters
+        foreach (str_split($_SESSION[self::$wordToBeGuessed]) as $letter) {
+            if (in_array($letter, $_SESSION[self::$correctGuessedLetters], true)) {
+                $word .= $letter;
+            } else {
+                $word .= "_";
+            }
+        }
+
+        if ($word == $_SESSION[self::$wordToBeGuessed]) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private function isAlreadyGuessed(string $letter): bool

@@ -44,5 +44,3 @@ $hangman = new \hangman\Application();
 $masterController->run();
 
 $layoutView->render($loggedInState->getState(), $loginView, $registerView, $dateTimeView, $hangman);
-
-var_dump($_SESSION);

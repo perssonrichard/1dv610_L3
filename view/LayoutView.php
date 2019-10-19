@@ -2,6 +2,7 @@
 
 namespace view;
 
+
 class LayoutView
 {
   private static $registerQueryString = 'register';
@@ -24,11 +25,9 @@ class LayoutView
         </div>
           <div class="container">
               ' . $this->viewToRender($loginView, $registerView) . '
+              ' . $this->renderHangman($isLoggedIn, $hangman) . '
               ' . $dtv->show() . '
           </div>
-
-              ' . $hangman->play() . '
-
          </body>
       </html>
     ';
@@ -64,6 +63,13 @@ class LayoutView
       return '<h2>Logged in</h2>';
     } else {
       return '<h2>Not logged in</h2>';
+    }
+  }
+
+  private function renderHangman($isLoggedIn, \hangman\Application $hangman)
+  {
+    if ($isLoggedIn) {
+      return $hangman->play();
     }
   }
 }
