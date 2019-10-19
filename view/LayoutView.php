@@ -5,8 +5,6 @@ namespace view;
 
 class LayoutView
 {
-  private static $registerQueryString = 'register';
-
   public function render($isLoggedIn, LoginView $loginView, RegisterView $registerView, DateTimeView $dtv, \hangman\Application $hangman)
   {
     echo '<!DOCTYPE html>
@@ -38,10 +36,10 @@ class LayoutView
    */
   private function linkToRender($isLoggedIn, LoginView $loginView, RegisterView $registerView)
   {
-    if (isset($_GET[self::$registerQueryString])) {
+    if (isset($_GET[UrlView::$registerQueryString])) {
       return $registerView->generateBackToLoginHTML();
     } else if ($isLoggedIn == false) {
-      return $loginView->generateRegisterUserHTML(self::$registerQueryString);
+      return $loginView->generateRegisterUserHTML(UrlView::$registerQueryString);
     }
   }
 
@@ -50,7 +48,7 @@ class LayoutView
    */
   private function viewToRender(LoginView $loginView, RegisterView $registerView)
   {
-    if (isset($_GET[self::$registerQueryString])) {
+    if (isset($_GET[UrlView::$registerQueryString])) {
       return $registerView->response();
     } else {
       return $loginView->response();

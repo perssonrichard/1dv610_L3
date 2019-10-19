@@ -4,8 +4,6 @@ namespace controller;
 
 class RegisterController
 {
-    private static $redirectUrl = 'Location: index.php';
-
     private $registerView;
     private $userDB;
     private $loginView;
@@ -66,7 +64,7 @@ class RegisterController
         $this->loginView->setNewUserSession();
         $this->loginView->setNewUsersNameSession($this->registerInput->getUsername());
 
-        header(self::$redirectUrl);
+        header(\view\UrlView::$redirect);
         exit();
     }
 }

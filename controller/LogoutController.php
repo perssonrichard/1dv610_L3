@@ -4,7 +4,6 @@ namespace controller;
 
 class LogoutController
 {
-    private static $redirectUrl = 'Location: index.php';
     private $loginView;
 
     public function __construct(\view\LoginView $lv)
@@ -22,7 +21,7 @@ class LogoutController
 
         $this->loginView->setLogoutSession();
 
-        header(self::$redirectUrl);
+        header(\view\UrlView::$redirect);
         exit();
     }
 }
