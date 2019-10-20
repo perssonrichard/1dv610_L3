@@ -5,7 +5,7 @@ namespace view;
 
 class LayoutView
 {
-  public function render($isLoggedIn, LoginView $loginView, RegisterView $registerView, DateTimeView $dtv, \hangman\Application $hangman)
+  public function render($isLoggedIn, LoginView $lv, RegisterView $rv, DateTimeView $dtv, \hangman\Application $hangman)
   {
     echo '<!DOCTYPE html>
       <html lang="en">
@@ -18,11 +18,11 @@ class LayoutView
         <body>
         <div class="container border-left border-right p-2">
           <h1>The Hangman Game</h1>
-          ' . $this->linkToRender($isLoggedIn, $loginView, $registerView) . '
+          ' . $this->linkToRender($isLoggedIn, $lv, $rv) . '
           ' . $this->renderIsLoggedIn($isLoggedIn) . '
         </div>
           <div class="container border-left border-right border-bottom p-2  ">
-              ' . $this->viewToRender($loginView, $registerView) . '
+              ' . $this->viewToRender($lv, $rv) . '
               ' . $this->renderHangman($isLoggedIn, $hangman) . '
               <div class="container fixed-bottom border">
               ' . $dtv->show() . '

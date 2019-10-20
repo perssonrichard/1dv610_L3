@@ -8,7 +8,7 @@ class RegisterInput
     private $password;
     private $repeatPassword;
 
-    public function __construct($username, $password, $repeatPassword)
+    public function __construct(string $username, string $password, string $repeatPassword)
     {
         $this->username = $username;
         $this->password = $password;

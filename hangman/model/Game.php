@@ -2,8 +2,7 @@
 
 namespace hangmanModel;
 
-class AlreadyGuessedLetterException extends \Exception
-{ }
+class AlreadyGuessedLetterException extends \Exception {}
 
 class HangmanGame
 {
@@ -85,13 +84,13 @@ class HangmanGame
 
     public function doRestartGame(): void
     {
-    $words = new Words();
+        $words = new Words();
 
-    $_SESSION[self::$wordToBeGuessed] = $words->getRandomWord();
-    $_SESSION[self::$correctGuessedLetters] = array();
-    $_SESSION[self::$allGuessedLetters] = array();
-    $_SESSION[self::$numberOfGuesses] = 0;
-    $_SESSION[self::$guessIsCorrect] = false;
+        $_SESSION[self::$wordToBeGuessed] = $words->getRandomWord();
+        $_SESSION[self::$correctGuessedLetters] = array();
+        $_SESSION[self::$allGuessedLetters] = array();
+        $_SESSION[self::$numberOfGuesses] = 0;
+        $_SESSION[self::$guessIsCorrect] = false;
     }
 
     public function isGuessCorrect(): bool

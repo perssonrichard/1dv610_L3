@@ -102,7 +102,6 @@ class LoginView
 	{
 		$userCredentials = $this->getUserCredentials();
 
-		// If keep me logged in is checked
 		if ($userCredentials->getKeepLoggedIn()) {
 			$user = $this->userDB->getUser($userCredentials);
 
@@ -123,7 +122,6 @@ class LoginView
 	{
 		$_SESSION[self::$newUsersName] = $name;
 	}
-
 
 	public function setLoggedInWithCookieSession(): void
 	{

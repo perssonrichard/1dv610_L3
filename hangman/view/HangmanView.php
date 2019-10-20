@@ -4,6 +4,7 @@ namespace hangmanView;
 
 class HangmanView
 {
+    // Define HTML ID's and session variables
     private static $guess = "HangmanView::Guess";
     private static $submit = "HangmanView::SubmitGuess";
     private static $message = "HangmanView::Message";

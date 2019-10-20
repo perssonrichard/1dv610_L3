@@ -103,7 +103,6 @@ class HangedMan
     /|\
     -------------';
 
-
     public function getHangedMan(int $guessNumber): string
     {
         switch ($guessNumber) {

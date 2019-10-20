@@ -8,7 +8,7 @@ class User
     private $password;
     private $cookiePassword;
 
-    public function __construct($username, $password, $cookiePassword)
+    public function __construct(string $username, string $password, string $cookiePassword)
     {
         $this->username = $username;
         $this->password = $password;

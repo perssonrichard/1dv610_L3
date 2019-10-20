@@ -37,11 +37,14 @@ class LoginController
         }
     }
 
+    /**
+     * Called when a user has cookies but no login state
+     */
     public function handleCookieUser(): void
     {
         $user = $this->loginView->getCookieUser();
 
-        if ($this->userDB->validateCookies($user)) {
+        if ($this->userDB->hasUser($user->getUsername()) && $this->userDB->isValidatedCookies($user)) {
             $this->loginView->setLoggedInWithCookieSession();
             $this->loggedInState->setState(true);
         } else {

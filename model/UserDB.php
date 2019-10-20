@@ -7,30 +7,24 @@ use Exception;
 class UserDB
 {
     /**
-     * LOCAL SERVER CONNECTION
+     * Server connection
      */
     private static $dbServerName = "localhost";
-    private static $dbUsername = "root";
-    private static $dbPassword = "";
-    private static $dbName = "loginsystem";
+    private static $dbUsername = "persglgr_root";
+    private static $dbPassword = "pa)gYnW99x*j";
+    private static $dbName = "persglgr_loginsystem_L3";
 
     /**
-     * REMOTE SERVER CONNECTION
-     */
-    // private static $dbServerName = "localhost";
-    // private static $dbUsername = "persglgr_root";
-    // private static $dbPassword = "pa)gYnW99x*j";
-    // private static $dbName = "persglgr_loginsystem_L3";
-
-    /**
-     * MYSQL TABLE INFORMATION
+     * MySQL table information
      */
     private static $sqlTableName = "users";
     private static $sqlNameRow = "user_username";
     private static $sqlPwdRow = "user_pwd";
     private static $sqlPwdCookieRow = "user_pwdCookie";
 
-
+    /**
+     * @var MySQL
+     */
     private $databaseConnection;
 
     public function __construct()
@@ -49,23 +43,23 @@ class UserDB
 
         $passwordHash = password_hash($password, PASSWORD_BCRYPT);
 
-        $searchString =
+        $sqlAddUserString =
             "INSERT INTO " . self::$sqlTableName .
             " ("
             . self::$sqlNameRow . ", " . self::$sqlPwdRow . ", " . self::$sqlPwdCookieRow .
             ") " .
             "VALUES ('$username', '$passwordHash', '$passwordHash');";
 
-        mysqli_query($this->databaseConnection, $searchString);
+        mysqli_query($this->databaseConnection, $sqlAddUserString);
     }
 
     public function getUser(UserCredentials $userCredentials): User
     {
         $username = $userCredentials->getUsername();
 
-        $searchString = "SELECT * FROM " . self::$sqlTableName . " WHERE BINARY " . self::$sqlNameRow . "='$username';";
-        $result = mysqli_query($this->databaseConnection, $searchString);
-
+        $sqlGetUserString = "SELECT * FROM " . self::$sqlTableName . " WHERE BINARY " . self::$sqlNameRow . "='$username';";
+        
+        $result = mysqli_query($this->databaseConnection, $sqlGetUserString);
         $userArr = mysqli_fetch_assoc($result);
 
         return new User($userArr[self::$sqlNameRow], $userArr[self::$sqlPwdRow], $userArr[self::$sqlPwdCookieRow]);
@@ -93,12 +87,8 @@ class UserDB
         return password_verify($userCredentials->getPassword(), $databaseUser->getPassword());
     }
 
-    public function validateCookies(UserCredentials $userCredentials): bool
+    public function isValidatedCookies(UserCredentials $userCredentials): bool
     {
-        if (!$this->hasUser($userCredentials->getUsername())) {
-            return false;
-        }
-
         $databaseUser = $this->getUser($userCredentials);
 
         if ($databaseUser->getCookiePassword() == $userCredentials->getPassword()) {

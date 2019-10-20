@@ -10,6 +10,7 @@ class GuessedLetter
 
     public function __construct(string $letter)
     {
+        // ctype alpha checks for alphabetic characters
         if (!ctype_alpha($letter) || strlen($letter) != 1) {
             throw new GuessIsNotOneLetterException();
         }

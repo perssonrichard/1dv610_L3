@@ -16,6 +16,7 @@ class controller
     public function run()
     {
         try {
+            // Unset previous message
             $this->view->unsetMessage();
 
             $this->guessLetter();
