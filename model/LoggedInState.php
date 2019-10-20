@@ -4,8 +4,8 @@ namespace model;
 
 class LoggedInState
 {
-    private static $loggedIn = "loggedIn";
-    private static $sessionValidation = "sessionValidation";
+    private static $loggedIn = "_loggedIn";
+    private static $sessionValidation = "_sessionValidation";
 
     public function __construct()
     {

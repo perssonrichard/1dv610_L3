@@ -58,10 +58,6 @@ class Application
 
     public function run()
     {
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         $this->mc->run();
         $this->view->render($this->lis->getState(), $this->lv, $this->rv, $this->dtv, $this->hm);
     }

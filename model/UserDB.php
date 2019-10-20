@@ -9,10 +9,10 @@ class UserDB
     /**
      * Server connection
      */
-    private static $dbServerName = "SERVERNAME";
-    private static $dbUsername = "DATABASE USER NAME";
-    private static $dbPassword = "DATABASE USER PASSWORD";
-    private static $dbName = "DATABASE NAME";
+    private static $dbServerName = DB_SERVER_NAME;
+    private static $dbUsername = DB_USERNAME_NAME;
+    private static $dbPassword = DB_USERNAME_PASSWORD;
+    private static $dbName = DB_NAME;
 
     /**
      * MySQL table information

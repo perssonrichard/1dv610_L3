@@ -1,6 +1,7 @@
 <?php
 
-require_once('application.php');
+require_once('Application.php');
+session_start();
 
 $app = new Application();
 
